@@ -5,22 +5,6 @@ from typing import Optional, Dict, Any
 from .base import BaseLookupProvider
 
 
-def is_cjk(char: str) -> bool:
-    """Check if character is within standard CJK ideograph ranges."""
-    if not char:
-        return False
-    code = ord(char[0])
-    return (
-        0x4E00 <= code <= 0x9FFF
-        or 0x3400 <= code <= 0x4DBF
-        or 0x20000 <= code <= 0x2A6DF
-        or 0x2A700 <= code <= 0x2B73F
-        or 0x2B740 <= code <= 0x2B81F
-        or 0x2B820 <= code <= 0x2CEAF
-        or 0xF900 <= code <= 0xFAFF
-    )
-
-
 class VariantMappingProvider(BaseLookupProvider):
     """Provides cross-reference character variant data from precompiled JSON."""
 
@@ -38,7 +22,7 @@ class VariantMappingProvider(BaseLookupProvider):
                 self._data = json.load(f)
 
     def lookup(self, char: str) -> Optional[Dict[str, Any]]:
-        if not char or not is_cjk(char):
+        if not char:
             return None
 
         char = char[0]
@@ -64,6 +48,7 @@ class VariantMappingProvider(BaseLookupProvider):
                 hovered_variant = "tc"
 
             return {
+                "found": True,
                 "char": char,
                 "jp": jp_list,
                 "sc": sc_list,
@@ -76,16 +61,9 @@ class VariantMappingProvider(BaseLookupProvider):
                 "hovered_variant": hovered_variant,
             }
 
-        # Fallback for unlisted CJK ideographs
+        # Else: character not in mapping -> empty state
         return {
+            "found": False,
             "char": char,
-            "jp": [char],
-            "sc": [char],
-            "tc": [char],
-            "pinyin": [],
-            "onyomi": [],
-            "kunyomi": [],
-            "all_identical": True,
-            "all_different": False,
-            "hovered_variant": None,
+            "message": "No character cross-reference found",
         }
