@@ -1,0 +1,8 @@
+{
+  "modifier_key": "Shift",
+  "theme": "auto",
+  "show_pinyin": true,
+  "show_readings": true,
+  "popup_delay_ms": 60,
+  "font_size": 14
+}
