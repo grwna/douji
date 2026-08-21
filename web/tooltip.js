@@ -1,0 +1,349 @@
+/**
+ * Hanzi Kanji Cross-Reference Tooltip Controller
+ */
+(function () {
+  var config = Object.assign(
+    {
+      modifier_key: "Shift",
+      theme: "auto",
+      show_pinyin: true,
+      show_readings: true,
+      popup_delay_ms: 50,
+      font_size: 14,
+    },
+    window.HANZI_KANJI_INITIAL_CONFIG || {}
+  );
+
+  var container = null;
+  var highlightOverlay = null;
+  var hoverTimer = null;
+  var currentRequestId = 0;
+  var lastLookupChar = null;
+  var lastMousePos = { x: 0, y: 0 };
+  var activeCharRect = null;
+
+  function checkModifier(e) {
+    var mod = (config.modifier_key || "Shift").toLowerCase();
+    if (mod === "none") return true;
+    if (mod === "shift") return e.shiftKey;
+    if (mod === "alt") return e.altKey;
+    if (mod === "control" || mod === "ctrl") return e.ctrlKey;
+    return e.shiftKey;
+  }
+
+  // Highlight overlay placed directly on the Anki card surface over the hovered character
+  function getHighlightOverlay() {
+    if (highlightOverlay && document.body.contains(highlightOverlay)) {
+      return highlightOverlay;
+    }
+    highlightOverlay = document.getElementById("hk-highlight-overlay");
+    if (!highlightOverlay) {
+      highlightOverlay = document.createElement("div");
+      highlightOverlay.id = "hk-highlight-overlay";
+      document.body.appendChild(highlightOverlay);
+    }
+    return highlightOverlay;
+  }
+
+  function showHighlightOnCard(rect) {
+    var overlay = getHighlightOverlay();
+    overlay.style.left = rect.left + "px";
+    overlay.style.top = rect.top + "px";
+    overlay.style.width = rect.width + "px";
+    overlay.style.height = rect.height + "px";
+    overlay.style.display = "block";
+  }
+
+  function hideHighlightOnCard() {
+    if (highlightOverlay) {
+      highlightOverlay.style.display = "none";
+    }
+  }
+
+  function getCharFromPoint(x, y) {
+    var range, textNode, offset;
+
+    if (document.caretRangeFromPoint) {
+      range = document.caretRangeFromPoint(x, y);
+      if (range) {
+        textNode = range.startContainer;
+        offset = range.startOffset;
+      }
+    } else if (document.caretPositionFromPoint) {
+      var pos = document.caretPositionFromPoint(x, y);
+      if (pos) {
+        textNode = pos.offsetNode;
+        offset = pos.offset;
+      }
+    }
+
+    if (!textNode) return null;
+
+    if (textNode.nodeType === Node.ELEMENT_NODE) {
+      if (offset < textNode.childNodes.length) {
+        textNode = textNode.childNodes[offset];
+      } else if (textNode.childNodes.length > 0) {
+        textNode = textNode.childNodes[textNode.childNodes.length - 1];
+      }
+    }
+
+    while (textNode && textNode.nodeType === Node.ELEMENT_NODE && textNode.firstChild) {
+      textNode = textNode.firstChild;
+    }
+
+    if (!textNode || textNode.nodeType !== Node.TEXT_NODE) {
+      return null;
+    }
+
+    var text = textNode.textContent;
+    if (!text) return null;
+
+    var offsetsToTry = [];
+    if (offset < text.length) offsetsToTry.push(offset);
+    if (offset > 0 && offset <= text.length) offsetsToTry.push(offset - 1);
+
+    for (var i = 0; i < offsetsToTry.length; i++) {
+      var testOff = offsetsToTry[i];
+      var char = text.charAt(testOff);
+      if (!char || char.trim() === "") continue;
+
+      try {
+        var charRange = document.createRange();
+        charRange.setStart(textNode, testOff);
+        charRange.setEnd(textNode, testOff + 1);
+        var rect = charRange.getBoundingClientRect();
+
+        // Exact character bounding box test
+        var padX = 6;
+        var padY = 4;
+        if (
+          x >= rect.left - padX &&
+          x <= rect.right + padX &&
+          y >= rect.top - padY &&
+          y <= rect.bottom + padY
+        ) {
+          return { char: char, rect: rect };
+        }
+      } catch (err) {
+        // Fallback
+      }
+    }
+
+    return null;
+  }
+
+  function createContainer() {
+    if (container && document.body.contains(container)) return container;
+    container = document.getElementById("hk-tooltip-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "hk-tooltip-container";
+      document.body.appendChild(container);
+    }
+    return container;
+  }
+
+  function hideTooltip() {
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+      hoverTimer = null;
+    }
+    if (container) {
+      container.classList.remove("hk-visible");
+    }
+    hideHighlightOnCard();
+    lastLookupChar = null;
+  }
+
+  function positionTooltip(x, y, charRect) {
+    if (!container) return;
+
+    var margin = 10;
+    var docW = window.innerWidth;
+    var docH = window.innerHeight;
+    var rect = container.getBoundingClientRect();
+    var tooltipW = rect.width || 240;
+    var tooltipH = rect.height || 140;
+
+    var left = charRect ? charRect.left : x + margin;
+    var top = charRect ? charRect.bottom + margin : y + margin;
+
+    if (left + tooltipW > docW - 10) {
+      left = docW - tooltipW - 10;
+    }
+    if (left < 10) {
+      left = 10;
+    }
+
+    if (top + tooltipH > docH - 10) {
+      top = (charRect ? charRect.top : y) - tooltipH - margin;
+    }
+    if (top < 10) {
+      top = 10;
+    }
+
+    container.style.left = left + "px";
+    container.style.top = top + "px";
+  }
+
+  function renderTooltip(data, charRect) {
+    createContainer();
+
+    var char = data.char || "";
+    var isFound = data.found !== false;
+
+    var html = "";
+    html += '<div class="hk-header">';
+    html += '  <div class="hk-main-char">' + escapeHtml(char) + '</div>';
+    html += '</div>';
+
+    if (!isFound) {
+      // Empty state
+      var msg = data.message || "No character cross-reference found";
+      html += '<div class="hk-notice-message">' + escapeHtml(msg) + '</div>';
+    } else {
+      // Character found in mapping
+      var jp = (data.jp && data.jp.length) ? data.jp[0] : char;
+      var sc = (data.sc && data.sc.length) ? data.sc[0] : char;
+      var tc = (data.tc && data.tc.length) ? data.tc[0] : char;
+
+      var allDiff = Boolean(data.all_different);
+      var hoveredVar = data.hovered_variant;
+
+      var jpHlight = allDiff && hoveredVar === "jp" ? " hk-highlighted" : "";
+      var scHlight = allDiff && hoveredVar === "sc" ? " hk-highlighted" : "";
+      var tcHlight = allDiff && hoveredVar === "tc" ? " hk-highlighted" : "";
+
+      html += '<div class="hk-variants-list">';
+      html += '  <div class="hk-variant-row' + jpHlight + '">';
+      html += '    <span class="hk-label">🇯🇵 JP</span>';
+      html += '    <span class="hk-char-val">' + escapeHtml(jp) + '</span>';
+      html += '  </div>';
+      html += '  <div class="hk-variant-row' + scHlight + '">';
+      html += '    <span class="hk-label">🇨🇳 SC</span>';
+      html += '    <span class="hk-char-val">' + escapeHtml(sc) + '</span>';
+      html += '  </div>';
+      html += '  <div class="hk-variant-row' + tcHlight + '">';
+      html += '    <span class="hk-label">🇹🇼 TC</span>';
+      html += '    <span class="hk-char-val">' + escapeHtml(tc) + '</span>';
+      html += '  </div>';
+      html += '</div>';
+
+      var hasPinyin = config.show_pinyin && data.pinyin && data.pinyin.length > 0;
+      var hasReadings = config.show_readings && ((data.onyomi && data.onyomi.length > 0) || (data.kunyomi && data.kunyomi.length > 0));
+
+      if (hasPinyin || hasReadings) {
+        html += '<div class="hk-readings">';
+        if (hasPinyin) {
+          html += '<div class="hk-reading-row">';
+          html += '  <span class="hk-reading-label">Pinyin</span>';
+          html += '  <span class="hk-reading-val">' + escapeHtml(data.pinyin.join(", ")) + '</span>';
+          html += '</div>';
+        }
+        if (hasReadings) {
+          var readingsParts = [];
+          if (data.onyomi && data.onyomi.length > 0) {
+            readingsParts.push("On: " + data.onyomi.join(", "));
+          }
+          if (data.kunyomi && data.kunyomi.length > 0) {
+            readingsParts.push("Kun: " + data.kunyomi.join(", "));
+          }
+          html += '<div class="hk-reading-row">';
+          html += '  <span class="hk-reading-label">Kana</span>';
+          html += '  <span class="hk-reading-val">' + escapeHtml(readingsParts.join(" | ")) + '</span>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+    }
+
+    container.innerHTML = html;
+    positionTooltip(lastMousePos.x, lastMousePos.y, charRect);
+    container.classList.add("hk-visible");
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function onMouseMove(e) {
+    lastMousePos = { x: e.clientX, y: e.clientY };
+
+    if (!checkModifier(e)) {
+      hideTooltip();
+      return;
+    }
+
+    var hit = getCharFromPoint(e.clientX, e.clientY);
+    if (!hit) {
+      hideTooltip();
+      return;
+    }
+
+    // Highlight the character directly on the card
+    showHighlightOnCard(hit.rect);
+    activeCharRect = hit.rect;
+
+    var char = hit.char;
+    if (char === lastLookupChar) {
+      return;
+    }
+
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+    }
+
+    hoverTimer = setTimeout(function () {
+      lastLookupChar = char;
+      currentRequestId++;
+      var reqId = String(currentRequestId);
+
+      var payload = JSON.stringify({ char: char, req_id: reqId });
+
+      if (typeof pycmd !== "undefined") {
+        pycmd("hanzikanji:lookup:" + payload, function (res) {
+          if (res && window.HanziKanjiBridge) {
+            window.HanziKanjiBridge.onResult(res, reqId, activeCharRect);
+          }
+        });
+      }
+    }, config.popup_delay_ms || 50);
+  }
+
+  function onKeyUp(e) {
+    if (!checkModifier(e)) {
+      hideTooltip();
+    }
+  }
+
+  document.removeEventListener("mousemove", onMouseMove);
+  document.removeEventListener("keyup", onKeyUp);
+  document.addEventListener("mousemove", onMouseMove, { passive: true });
+  document.addEventListener("keyup", onKeyUp, { passive: true });
+  document.addEventListener("mouseleave", hideTooltip, { passive: true });
+  window.addEventListener("scroll", hideTooltip, { passive: true });
+
+  window.HanziKanjiBridge = {
+    onResult: function (data, reqId, charRect) {
+      if (!data) {
+        hideTooltip();
+        return;
+      }
+      if (reqId && String(reqId) !== String(currentRequestId)) {
+        return;
+      }
+      renderTooltip(data, charRect || activeCharRect);
+    },
+    onConfig: function (newConfig) {
+      if (newConfig) {
+        config = Object.assign(config, newConfig);
+      }
+    },
+  };
+})();
