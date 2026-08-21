@@ -2,8 +2,9 @@
 
 **Douji (同字)** is an Anki add-on that instantly cross-references CJK characters across **Japanese (Kanji)**, **Simplified Chinese (Hanzi)**, and **Traditional Chinese (Hanzi)**. Hover over any character in the reviewer while holding a modifier key to view its regional variant forms alongside Mandarin Pinyin and Japanese Kana readings in a clean, Yomitan-inspired popup.
 
-<!-- SCREENSHOT PLACEHOLDER -->
-![Preview](assets/screenshot.png)
+<p align="center">
+  <img src="docs/assets/screenshot.png" alt="Douji Preview" width="560" />
+</p>
 
 ---
 
@@ -24,8 +25,9 @@
 
 Hold <kbd>Shift</kbd> (or your configured modifier key) and hover over any Hanzi or Kanji character on your cards. The tooltip will appear instantly with the cross-referenced forms and readings.
 
-<!-- GIF PLACEHOLDER -->
-![Hover Demo](assets/demo.gif)
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Hover Demo" width="560" />
+</p>
 
 - **Regional Variants**: Displays 🇯🇵 JP (Japanese), 🇨🇳 SC (Simplified Chinese), and 🇹🇼 TC (Traditional Chinese) forms.
 - **Readings**: Displays tone-marked Pinyin (Mandarin) and On-yomi / Kun-yomi (Japanese Kana).
@@ -70,7 +72,7 @@ Customize behavior, keys, fonts, and appearance via **Tools** → **Add-ons** �
 
 > **Note:** `"None"` triggers on every hover without any key pressed, which may cause popup spam while reading.
 
-For detailed explanations of all settings, see [`config.md`](config.md).
+For detailed explanations of all settings, see [`config.md`](docs/CONFIG.md).
 
 
 ---

@@ -30,5 +30,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit test suite for character resolution and variant matching.
 - Automated packaging script (`package.sh`) producing `.ankiaddon` releases.
 
-[unreleased]: https://github.com/USER/REPO/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/USER/REPO/releases/tag/v1.0.0
+[unreleased]: https://github.com/grwna/douji/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/grwna/douji/releases/tag/v1.0.0
