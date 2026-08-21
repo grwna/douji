@@ -6,10 +6,16 @@
     {
       modifier_key: "Shift",
       theme: "auto",
+      popup_delay_ms: 30,
+      character_font_size: 24,
+      reading_font_size: 13,
+      bold_characters: false,
+      japanese_font: "Yu Gothic, Meiryo, 'Hiragino Sans', sans-serif",
+      chinese_font: "'Microsoft YaHei', 'PingFang SC', 'Source Han Sans CN', sans-serif",
+      popup_min_width: 220,
+      popup_max_width: 320,
       show_pinyin: true,
       show_readings: true,
-      popup_delay_ms: 30,
-      font_size: 14,
     },
     window.HANZI_KANJI_INITIAL_CONFIG || {}
   );
@@ -44,6 +50,33 @@
     if (mod === "alt") return e.altKey;
     if (mod === "control" || mod === "ctrl") return e.ctrlKey;
     return e.shiftKey;
+  }
+
+  function applyConfigStyles() {
+    var c = createContainer();
+    if (!c) return;
+
+    var charSize = (config.character_font_size || config.font_size || 24) + "px";
+    var readingSize = (config.reading_font_size || 13) + "px";
+    var weight = config.bold_characters === false ? "400" : "700";
+
+    c.style.setProperty("--hk-char-size", charSize);
+    c.style.setProperty("--hk-reading-size", readingSize);
+    c.style.setProperty("--hk-char-weight", weight);
+
+    if (config.japanese_font) {
+      c.style.setProperty("--hk-jp-font", config.japanese_font);
+    }
+    if (config.chinese_font) {
+      c.style.setProperty("--hk-sc-font", config.chinese_font);
+      c.style.setProperty("--hk-tc-font", config.chinese_font);
+    }
+    if (config.popup_min_width) {
+      c.style.setProperty("--hk-min-width", config.popup_min_width + "px");
+    }
+    if (config.popup_max_width) {
+      c.style.setProperty("--hk-max-width", config.popup_max_width + "px");
+    }
   }
 
   function getHighlightOverlay() {
@@ -206,6 +239,7 @@
 
   function renderTooltip(data, charRect) {
     createContainer();
+    applyConfigStyles();
 
     var char = data.char || "";
     var isFound = Boolean(data.jp && data.jp.length > 0 && data.found !== false);
@@ -231,15 +265,15 @@
       var tcHlight = allDiff && hoveredVar === "tc" ? " hk-highlighted" : "";
 
       html += '<div class="hk-variants-list">';
-      html += '  <div class="hk-variant-row' + jpHlight + '">';
+      html += '  <div class="hk-variant-row hk-variant-jp' + jpHlight + '">';
       html += '    <span class="hk-label">🇯🇵 JP</span>';
       html += '    <span class="hk-char-val">' + escapeHtml(jp) + '</span>';
       html += '  </div>';
-      html += '  <div class="hk-variant-row' + scHlight + '">';
+      html += '  <div class="hk-variant-row hk-variant-sc' + scHlight + '">';
       html += '    <span class="hk-label">🇨🇳 SC</span>';
       html += '    <span class="hk-char-val">' + escapeHtml(sc) + '</span>';
       html += '  </div>';
-      html += '  <div class="hk-variant-row' + tcHlight + '">';
+      html += '  <div class="hk-variant-row hk-variant-tc' + tcHlight + '">';
       html += '    <span class="hk-label">🇹🇼 TC</span>';
       html += '    <span class="hk-char-val">' + escapeHtml(tc) + '</span>';
       html += '  </div>';
@@ -358,7 +392,10 @@
     onConfig: function (newConfig) {
       if (newConfig) {
         config = Object.assign(config, newConfig);
+        applyConfigStyles();
       }
     },
   };
+
+  applyConfigStyles();
 })();

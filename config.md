@@ -1,29 +1,38 @@
 # Configuration Options
 
 ### `modifier_key` (string)
-- The key that must be held down while hovering over a character to trigger the cross-reference popup.
-- Values: `"Shift"`, `"Alt"`, `"Control"`, or `"None"`.
-- Default: `"Shift"`.
+- Key to hold while hovering.
+- Values: `"Shift"`, `"Alt"`, `"Control"`, `"None"`. Default: `"Shift"`.
+
+### `character_font_size` (integer)
+- Font size in pixels for the main character and variant glyphs (`JP`, `SC`, `TC`).
+- Default: `24`.
+
+### `reading_font_size` (integer)
+- Font size in pixels for smaller text (Pinyin, Kana readings).
+- Default: `13`.
+
+### `bold_characters` (boolean)
+- Whether characters are displayed in bold weight (`700`) or normal weight (`400`).
+- Default: `true`.
+
+### `japanese_font` (string)
+- Font family CSS string used to render Japanese Kanji (`JP`).
+- Default: `"Yu Gothic, Meiryo, 'Hiragino Sans', sans-serif"`.
+
+### `chinese_font` (string)
+- Font family CSS string used to render Chinese Hanzi (`SC` and `TC`).
+- Default: `"'Microsoft YaHei', 'PingFang SC', 'Source Han Sans CN', sans-serif"`.
+
+### `popup_min_width` & `popup_max_width` (integer)
+- Minimum and maximum width of the popup in pixels.
+- Defaults: `220` and `320`.
 
 ### `theme` (string)
-- Color scheme of the floating popup tooltip.
-- Values: `"auto"` (follows Anki dark/light mode), `"dark"`, or `"light"`.
-- Default: `"auto"`.
-
-### `show_pinyin` (boolean)
-- Whether to display Mandarin Pinyin readings for Chinese variants.
-- Values: `true`, `false`.
-- Default: `true`.
-
-### `show_readings` (boolean)
-- Whether to display Japanese On-yomi and Kun-yomi readings for Kanji.
-- Values: `true`, `false`.
-- Default: `true`.
+- Color scheme: `"auto"` (matches Anki night mode), `"dark"`, `"light"`. Default: `"auto"`.
 
 ### `popup_delay_ms` (integer)
-- Debounce delay in milliseconds before the popup appears on hover.
-- Default: `60`.
+- Hover debounce delay in milliseconds. Default: `30`.
 
-### `font_size` (integer)
-- Base font size in pixels for the tooltip content.
-- Default: `14`.
+### `show_pinyin` & `show_readings` (boolean)
+- Toggles for displaying Pinyin and Japanese Kana readings. Defaults: `true`.
