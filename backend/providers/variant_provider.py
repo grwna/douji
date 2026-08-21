@@ -1,0 +1,91 @@
+"""Variant mapping lookup provider."""
+import json
+import os
+from typing import Optional, Dict, Any
+from .base import BaseLookupProvider
+
+
+def is_cjk(char: str) -> bool:
+    """Check if character is within standard CJK ideograph ranges."""
+    if not char:
+        return False
+    code = ord(char[0])
+    return (
+        0x4E00 <= code <= 0x9FFF
+        or 0x3400 <= code <= 0x4DBF
+        or 0x20000 <= code <= 0x2A6DF
+        or 0x2A700 <= code <= 0x2B73F
+        or 0x2B740 <= code <= 0x2B81F
+        or 0x2B820 <= code <= 0x2CEAF
+        or 0xF900 <= code <= 0xFAFF
+    )
+
+
+class VariantMappingProvider(BaseLookupProvider):
+    """Provides cross-reference character variant data from precompiled JSON."""
+
+    def __init__(self, data_path: Optional[str] = None):
+        if data_path is None:
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            data_path = os.path.join(base_dir, "data", "char_variants.json")
+        self.data_path = data_path
+        self._data: Dict[str, Any] = {}
+        self._load_data()
+
+    def _load_data(self) -> None:
+        if os.path.exists(self.data_path):
+            with open(self.data_path, "r", encoding="utf-8") as f:
+                self._data = json.load(f)
+
+    def lookup(self, char: str) -> Optional[Dict[str, Any]]:
+        if not char or not is_cjk(char):
+            return None
+
+        char = char[0]
+        entry = self._data.get(char)
+
+        if entry:
+            jp_list = entry.get("jp", [char])
+            sc_list = entry.get("sc", [char])
+            tc_list = entry.get("tc", [char])
+            jp_val = jp_list[0] if jp_list else char
+            sc_val = sc_list[0] if sc_list else char
+            tc_val = tc_list[0] if tc_list else char
+
+            all_identical = (jp_val == sc_val == tc_val)
+            all_different = (jp_val != sc_val and jp_val != tc_val and sc_val != tc_val)
+
+            hovered_variant = None
+            if char in jp_list:
+                hovered_variant = "jp"
+            elif char in sc_list:
+                hovered_variant = "sc"
+            elif char in tc_list:
+                hovered_variant = "tc"
+
+            return {
+                "char": char,
+                "jp": jp_list,
+                "sc": sc_list,
+                "tc": tc_list,
+                "pinyin": entry.get("pinyin", []),
+                "onyomi": entry.get("onyomi", []),
+                "kunyomi": entry.get("kunyomi", []),
+                "all_identical": all_identical,
+                "all_different": all_different,
+                "hovered_variant": hovered_variant,
+            }
+
+        # Fallback for unlisted CJK ideographs
+        return {
+            "char": char,
+            "jp": [char],
+            "sc": [char],
+            "tc": [char],
+            "pinyin": [],
+            "onyomi": [],
+            "kunyomi": [],
+            "all_identical": True,
+            "all_different": False,
+            "hovered_variant": None,
+        }
