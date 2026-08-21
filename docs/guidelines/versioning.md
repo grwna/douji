@@ -43,7 +43,7 @@ Move items from `[Unreleased]` into a new dated section:
 
 Add the comparison link at the bottom of the file:
 ```markdown
-[1.2.0]: https://github.com/YOU/REPO/compare/v1.1.0...v1.2.0
+[1.2.0]: https://github.com/grwna/douji/compare/v1.1.0...v1.2.0
 ```
 
 **3. Commit and tag**
@@ -77,8 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release.
 
-[unreleased]: https://github.com/YOU/REPO/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/YOU/REPO/releases/tag/v1.0.0
+[unreleased]: https://github.com/grwna/douji/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/grwna/douji/releases/tag/v1.0.0
 ```
 
 ---

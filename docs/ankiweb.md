@@ -32,6 +32,10 @@ https://github.com/grwna/douji/issues
 
 Hover over any character in the reviewer while holding a modifier key to view its regional variant forms alongside Mandarin Pinyin and Japanese Kana readings in a clean, Yomitan-inspired popup.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/grwna/douji/main/docs/assets/screenshot.png" width="560" alt="Douji Preview">
+</p>
+
 ---
 
 ### Key Features
@@ -50,6 +54,10 @@ Hover over any character in the reviewer while holding a modifier key to view it
 1. Hold <kbd>Shift</kbd> (or your configured trigger key) while reviewing cards.
 2. Hover the mouse over any Hanzi or Kanji character.
 3. The cross-reference popup will appear instantly.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/grwna/douji/main/docs/assets/demo.gif" width="560" alt="Hover Demo">
+</p>
 
 *Note: Kana (Hiragana/Katakana), Latin letters, numbers, and punctuation are automatically ignored.*
 
@@ -78,6 +86,6 @@ Customize options via **Tools** → **Add-ons** → select **Douji** → **Confi
 ### Source Code & Support
 
 - **GitHub Repository**: [github.com/grwna/douji](https://github.com/grwna/douji)
-- **Bug Tracker / Feature Requests**: [github.com/grwna/douji/issues](https://github.com/grwna/douji/issues)
+- **Bug Tracker / Report**: [github.com/grwna/douji/issues](https://github.com/grwna/douji/issues)
 - **License**: GNU General Public License v3.0 (GPL-3.0)
 ```

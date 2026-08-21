@@ -39,13 +39,13 @@ Hold <kbd>Shift</kbd> (or your configured modifier key) and hover over any Hanzi
 
 ### Method 1: AnkiWeb (Recommended)
 1. In Anki, go to **Tools** → **Add-ons** → **Get Add-ons...**
-2. Paste the Add-on Code: `<!-- ANKIWEB CODE PLACEHOLDER -->`
+2. Paste the Add-on Code: `2058654519`
 3. Click **OK** and restart Anki.
 
-Ankiweb page: []()
+Ankiweb page: [https://ankiweb.net/shared/info/2058654519](https://ankiweb.net/shared/info/2058654519)
 
 ### Method 2: Manual (.ankiaddon)
-1. Download the latest `.ankiaddon` file from the [Releases](https://github.com/USER/REPO/releases) page.
+1. Download the latest `.ankiaddon` file from the [Releases](https://github.com/grwna/douji/releases) page.
 2. Double-click the downloaded file or drag and drop it into Anki.
 3. Restart Anki.
 
