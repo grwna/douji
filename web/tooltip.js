@@ -58,7 +58,7 @@
 
     var charSize = (config.character_font_size || config.font_size || 24) + "px";
     var readingSize = (config.reading_font_size || 13) + "px";
-    var weight = config.bold_characters === false ? "400" : "700";
+    var weight = config.bold_characters === true ? "700" : "400";
 
     c.style.setProperty("--hk-char-size", charSize);
     c.style.setProperty("--hk-reading-size", readingSize);
@@ -76,6 +76,15 @@
     }
     if (config.popup_max_width) {
       c.style.setProperty("--hk-max-width", config.popup_max_width + "px");
+    }
+
+    // Explicit Theme Switching (Light / Dark / Auto)
+    c.classList.remove("hk-theme-light", "hk-theme-dark");
+    var theme = (config.theme || "auto").toLowerCase();
+    if (theme === "light") {
+      c.classList.add("hk-theme-light");
+    } else if (theme === "dark") {
+      c.classList.add("hk-theme-dark");
     }
   }
 
