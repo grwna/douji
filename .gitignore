@@ -49,5 +49,8 @@ Desktop.ini
 .pytest_cache/
 htmlcov/
 
+# Auto files
+meta.json
+
 # Markdown
 *_plan.md

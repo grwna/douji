@@ -1,5 +1,5 @@
 /**
- * Hanzi Kanji Cross-Reference Tooltip Controller
+ * Douji (同字) Tooltip Controller
  */
 (function () {
   var config = Object.assign(
@@ -17,7 +17,7 @@
       show_pinyin: true,
       show_readings: true,
     },
-    window.HANZI_KANJI_INITIAL_CONFIG || {}
+    window.DOUJI_INITIAL_CONFIG || {}
   );
 
   var container = null;
@@ -60,31 +60,31 @@
     var readingSize = (config.reading_font_size || 13) + "px";
     var weight = config.bold_characters === true ? "700" : "400";
 
-    c.style.setProperty("--hk-char-size", charSize);
-    c.style.setProperty("--hk-reading-size", readingSize);
-    c.style.setProperty("--hk-char-weight", weight);
+    c.style.setProperty("--douji-char-size", charSize);
+    c.style.setProperty("--douji-reading-size", readingSize);
+    c.style.setProperty("--douji-char-weight", weight);
 
     if (config.japanese_font) {
-      c.style.setProperty("--hk-jp-font", config.japanese_font);
+      c.style.setProperty("--douji-jp-font", config.japanese_font);
     }
     if (config.chinese_font) {
-      c.style.setProperty("--hk-sc-font", config.chinese_font);
-      c.style.setProperty("--hk-tc-font", config.chinese_font);
+      c.style.setProperty("--douji-sc-font", config.chinese_font);
+      c.style.setProperty("--douji-tc-font", config.chinese_font);
     }
     if (config.popup_min_width) {
-      c.style.setProperty("--hk-min-width", config.popup_min_width + "px");
+      c.style.setProperty("--douji-min-width", config.popup_min_width + "px");
     }
     if (config.popup_max_width) {
-      c.style.setProperty("--hk-max-width", config.popup_max_width + "px");
+      c.style.setProperty("--douji-max-width", config.popup_max_width + "px");
     }
 
     // Explicit Theme Switching (Light / Dark / Auto)
-    c.classList.remove("hk-theme-light", "hk-theme-dark");
+    c.classList.remove("douji-theme-light", "douji-theme-dark");
     var theme = (config.theme || "auto").toLowerCase();
     if (theme === "light") {
-      c.classList.add("hk-theme-light");
+      c.classList.add("douji-theme-light");
     } else if (theme === "dark") {
-      c.classList.add("hk-theme-dark");
+      c.classList.add("douji-theme-dark");
     }
   }
 
@@ -92,10 +92,10 @@
     if (highlightOverlay && document.body.contains(highlightOverlay)) {
       return highlightOverlay;
     }
-    highlightOverlay = document.getElementById("hk-highlight-overlay");
+    highlightOverlay = document.getElementById("douji-highlight-overlay");
     if (!highlightOverlay) {
       highlightOverlay = document.createElement("div");
-      highlightOverlay.id = "hk-highlight-overlay";
+      highlightOverlay.id = "douji-highlight-overlay";
       document.body.appendChild(highlightOverlay);
     }
     return highlightOverlay;
@@ -193,10 +193,10 @@
 
   function createContainer() {
     if (container && document.body.contains(container)) return container;
-    container = document.getElementById("hk-tooltip-container");
+    container = document.getElementById("douji-tooltip-container");
     if (!container) {
       container = document.createElement("div");
-      container.id = "hk-tooltip-container";
+      container.id = "douji-tooltip-container";
       document.body.appendChild(container);
     }
     return container;
@@ -208,7 +208,7 @@
       hoverTimer = null;
     }
     if (container) {
-      container.classList.remove("hk-visible");
+      container.classList.remove("douji-visible");
     }
     hideHighlightOnCard();
     activeChar = null;
@@ -254,13 +254,13 @@
     var isFound = Boolean(data.jp && data.jp.length > 0 && data.found !== false);
 
     var html = "";
-    html += '<div class="hk-header">';
-    html += '  <div class="hk-main-char">' + escapeHtml(char) + '</div>';
+    html += '<div class="douji-header">';
+    html += '  <div class="douji-main-char">' + escapeHtml(char) + '</div>';
     html += '</div>';
 
     if (!isFound) {
       var msg = data.message || "No character cross-reference found";
-      html += '<div class="hk-notice-message">' + escapeHtml(msg) + '</div>';
+      html += '<div class="douji-notice-message">' + escapeHtml(msg) + '</div>';
     } else {
       var jp = data.jp[0];
       var sc = (data.sc && data.sc.length) ? data.sc[0] : char;
@@ -269,22 +269,22 @@
       var allDiff = Boolean(data.all_different);
       var hoveredVar = data.hovered_variant;
 
-      var jpHlight = allDiff && hoveredVar === "jp" ? " hk-highlighted" : "";
-      var scHlight = allDiff && hoveredVar === "sc" ? " hk-highlighted" : "";
-      var tcHlight = allDiff && hoveredVar === "tc" ? " hk-highlighted" : "";
+      var jpHlight = allDiff && hoveredVar === "jp" ? " douji-highlighted" : "";
+      var scHlight = allDiff && hoveredVar === "sc" ? " douji-highlighted" : "";
+      var tcHlight = allDiff && hoveredVar === "tc" ? " douji-highlighted" : "";
 
-      html += '<div class="hk-variants-list">';
-      html += '  <div class="hk-variant-row hk-variant-jp' + jpHlight + '">';
-      html += '    <span class="hk-label">🇯🇵 JP</span>';
-      html += '    <span class="hk-char-val">' + escapeHtml(jp) + '</span>';
+      html += '<div class="douji-variants-list">';
+      html += '  <div class="douji-variant-row douji-variant-jp' + jpHlight + '">';
+      html += '    <span class="douji-label">🇯🇵 JP</span>';
+      html += '    <span class="douji-char-val">' + escapeHtml(jp) + '</span>';
       html += '  </div>';
-      html += '  <div class="hk-variant-row hk-variant-sc' + scHlight + '">';
-      html += '    <span class="hk-label">🇨🇳 SC</span>';
-      html += '    <span class="hk-char-val">' + escapeHtml(sc) + '</span>';
+      html += '  <div class="douji-variant-row douji-variant-sc' + scHlight + '">';
+      html += '    <span class="douji-label">🇨🇳 SC</span>';
+      html += '    <span class="douji-char-val">' + escapeHtml(sc) + '</span>';
       html += '  </div>';
-      html += '  <div class="hk-variant-row hk-variant-tc' + tcHlight + '">';
-      html += '    <span class="hk-label">🇹🇼 TC</span>';
-      html += '    <span class="hk-char-val">' + escapeHtml(tc) + '</span>';
+      html += '  <div class="douji-variant-row douji-variant-tc' + tcHlight + '">';
+      html += '    <span class="douji-label">🇹🇼 TC</span>';
+      html += '    <span class="douji-char-val">' + escapeHtml(tc) + '</span>';
       html += '  </div>';
       html += '</div>';
 
@@ -293,20 +293,20 @@
       var kunyomi = config.show_readings && data.kunyomi && data.kunyomi.length > 0 ? data.kunyomi : null;
 
       if (hasPinyin || onyomi || kunyomi) {
-        html += '<div class="hk-readings">';
+        html += '<div class="douji-readings">';
         if (hasPinyin) {
-          html += '<div class="hk-reading-row">';
-          html += '  <span class="hk-reading-label">Pinyin</span>';
-          html += '  <span class="hk-reading-val">' + escapeHtml(data.pinyin.join(", ")) + '</span>';
+          html += '<div class="douji-reading-row">';
+          html += '  <span class="douji-reading-label">Pinyin</span>';
+          html += '  <span class="douji-reading-val">' + escapeHtml(data.pinyin.join(", ")) + '</span>';
           html += '</div>';
         }
         if (onyomi || kunyomi) {
           var readingsParts = [];
           if (onyomi) readingsParts.push("On: " + onyomi.join(", "));
           if (kunyomi) readingsParts.push("Kun: " + kunyomi.join(", "));
-          html += '<div class="hk-reading-row">';
-          html += '  <span class="hk-reading-label">Kana</span>';
-          html += '  <span class="hk-reading-val">' + escapeHtml(readingsParts.join(" | ")) + '</span>';
+          html += '<div class="douji-reading-row">';
+          html += '  <span class="douji-reading-label">Kana</span>';
+          html += '  <span class="douji-reading-val">' + escapeHtml(readingsParts.join(" | ")) + '</span>';
           html += '</div>';
         }
         html += '</div>';
@@ -315,7 +315,7 @@
 
     container.innerHTML = html;
     positionTooltip(lastMousePos.x, lastMousePos.y, charRect);
-    container.classList.add("hk-visible");
+    container.classList.add("douji-visible");
   }
 
   function escapeHtml(str) {
@@ -362,9 +362,9 @@
       var payload = JSON.stringify({ char: char, req_id: reqId });
 
       if (typeof pycmd !== "undefined") {
-        pycmd("hanzikanji:lookup:" + payload, function (res) {
-          if (res && window.HanziKanjiBridge) {
-            window.HanziKanjiBridge.onResult(res, reqId, activeCharRect);
+        pycmd("douji:lookup:" + payload, function (res) {
+          if (res && window.DoujiBridge) {
+            window.DoujiBridge.onResult(res, reqId, activeCharRect);
           }
         });
       }
@@ -384,7 +384,7 @@
   document.addEventListener("mouseleave", hideTooltip, { passive: true });
   window.addEventListener("scroll", hideTooltip, { passive: true });
 
-  window.HanziKanjiBridge = {
+  window.DoujiBridge = {
     onResult: function (data, reqId, charRect) {
       if (!data) {
         hideTooltip();

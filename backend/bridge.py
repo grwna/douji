@@ -5,7 +5,7 @@ from typing import Any, Tuple
 from .engine import LookupEngine
 from .config import ConfigManager
 
-PREFIX = "hanzikanji:"
+PREFIX = "douji:"
 
 
 class BridgeManager:
@@ -75,8 +75,8 @@ class BridgeManager:
             safe_req_id = json.dumps(req_id)
 
             callback_script = (
-                f"if (window.HanziKanjiBridge) {{"
-                f" window.HanziKanjiBridge.onResult({result_json}, {safe_req_id});"
+                f"if (window.DoujiBridge) {{"
+                f" window.DoujiBridge.onResult({result_json}, {safe_req_id});"
                 f" }}"
             )
             self._eval_js(context, callback_script)
@@ -86,8 +86,8 @@ class BridgeManager:
             conf = self.config_manager.all()
             conf_json = json.dumps(conf, ensure_ascii=False)
             callback_script = (
-                f"if (window.HanziKanjiBridge) {{"
-                f" window.HanziKanjiBridge.onConfig({conf_json});"
+                f"if (window.DoujiBridge) {{"
+                f" window.DoujiBridge.onConfig({conf_json});"
                 f" }}"
             )
             self._eval_js(context, callback_script)
@@ -105,11 +105,11 @@ class BridgeManager:
         config_json = json.dumps(self.config_manager.all(), ensure_ascii=False)
 
         init_script = f"""
-        <style id="hanzi-kanji-styles">
+        <style id="douji-styles">
         {css}
         </style>
-        <script id="hanzi-kanji-script">
-        window.HANZI_KANJI_INITIAL_CONFIG = {config_json};
+        <script id="douji-script">
+        window.DOUJI_INITIAL_CONFIG = {config_json};
         {js}
         </script>
         """
@@ -129,16 +129,16 @@ class BridgeManager:
                 css = self._read_web_file("tooltip.css")
                 config_json = json.dumps(self.config_manager.all(), ensure_ascii=False)
                 ensure_script = (
-                    f"if (!document.getElementById('hanzi-kanji-styles')) {{"
+                    f"if (!document.getElementById('douji-styles')) {{"
                     f"  var s = document.createElement('style');"
-                    f"  s.id = 'hanzi-kanji-styles';"
+                    f"  s.id = 'douji-styles';"
                     f"  s.textContent = {json.dumps(css)};"
                     f"  document.head.appendChild(s);"
                     f"}}"
-                    f"if (!window.HANZI_KANJI_INITIAL_CONFIG) {{"
-                    f"  window.HANZI_KANJI_INITIAL_CONFIG = {config_json};"
+                    f"if (!window.DOUJI_INITIAL_CONFIG) {{"
+                    f"  window.DOUJI_INITIAL_CONFIG = {config_json};"
                     f"}}"
-                    f"if (!window.HanziKanjiBridge) {{"
+                    f"if (!window.DoujiBridge) {{"
                     f"  {self._read_web_file('tooltip.js')}"
                     f"}}"
                 )

@@ -1,65 +1,65 @@
-/* Hanzi Kanji Cross-Reference Tooltip Styles (Anki Native Palette) */
+/* Douji (同字) Tooltip Styles (Anki Native Palette) */
 
 /* Anki Light Theme Palette */
 :root,
-#hk-tooltip-container.hk-theme-light {
-  --hk-bg: #ffffff;
-  --hk-text: #212529;
-  --hk-text-muted: #6c757d;
-  --hk-border: #ced4da;
-  --hk-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --hk-accent: #0d6efd;
-  --hk-highlight-bg: rgba(13, 110, 253, 0.08);
-  --hk-highlight-border: #0d6efd;
-  --hk-char-selection: rgba(13, 110, 253, 0.25);
-  --hk-tag-bg: #f8f9fa;
-  --hk-tag-text: #495057;
-  --hk-divider: #e9ecef;
+#douji-tooltip-container.douji-theme-light {
+  --douji-bg: #ffffff;
+  --douji-text: #212529;
+  --douji-text-muted: #6c757d;
+  --douji-border: #ced4da;
+  --douji-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --douji-accent: #0d6efd;
+  --douji-highlight-bg: rgba(13, 110, 253, 0.08);
+  --douji-highlight-border: #0d6efd;
+  --douji-char-selection: rgba(13, 110, 253, 0.25);
+  --douji-tag-bg: #f8f9fa;
+  --douji-tag-text: #495057;
+  --douji-divider: #e9ecef;
 }
 
 /* Anki Dark / Night Mode Palette (Neutral Grey, no purple/blue tint) */
-body.night_mode #hk-tooltip-container:not(.hk-theme-light),
-body.nightMode #hk-tooltip-container:not(.hk-theme-light),
-.night_mode #hk-tooltip-container:not(.hk-theme-light),
-.nightMode #hk-tooltip-container:not(.hk-theme-light),
-#hk-tooltip-container.hk-theme-dark {
-  --hk-bg: #2f2f31;
-  --hk-text: #f0f0f0;
-  --hk-text-muted: #9a9a9e;
-  --hk-border: #444446;
-  --hk-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
-  --hk-accent: #5294e2;
-  --hk-highlight-bg: rgba(82, 148, 226, 0.15);
-  --hk-highlight-border: #5294e2;
-  --hk-char-selection: rgba(82, 148, 226, 0.35);
-  --hk-tag-bg: #3a3a3c;
-  --hk-tag-text: #d0d0d2;
-  --hk-divider: #3a3a3c;
+body.night_mode #douji-tooltip-container:not(.douji-theme-light),
+body.nightMode #douji-tooltip-container:not(.douji-theme-light),
+.night_mode #douji-tooltip-container:not(.douji-theme-light),
+.nightMode #douji-tooltip-container:not(.douji-theme-light),
+#douji-tooltip-container.douji-theme-dark {
+  --douji-bg: #2f2f31;
+  --douji-text: #f0f0f0;
+  --douji-text-muted: #9a9a9e;
+  --douji-border: #444446;
+  --douji-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --douji-accent: #5294e2;
+  --douji-highlight-bg: rgba(82, 148, 226, 0.15);
+  --douji-highlight-border: #5294e2;
+  --douji-char-selection: rgba(82, 148, 226, 0.35);
+  --douji-tag-bg: #3a3a3c;
+  --douji-tag-text: #d0d0d2;
+  --douji-divider: #3a3a3c;
 }
 
 /* Yomitan-style character highlight overlay (square corners) */
-#hk-highlight-overlay {
+#douji-highlight-overlay {
   position: fixed !important;
   z-index: 2147483646 !important;
-  background: var(--hk-char-selection, rgba(13, 110, 253, 0.25));
+  background: var(--douji-char-selection, rgba(13, 110, 253, 0.25));
   border-radius: 0 !important;
   pointer-events: none;
   display: none;
 }
 
 /* Popup container with sharp square corners */
-#hk-tooltip-container {
+#douji-tooltip-container {
   position: fixed !important;
   z-index: 2147483647 !important;
-  min-width: var(--hk-min-width, 220px);
-  max-width: var(--hk-max-width, 320px);
-  background: var(--hk-bg);
-  color: var(--hk-text);
-  border: 1px solid var(--hk-border);
+  min-width: var(--douji-min-width, 220px);
+  max-width: var(--douji-max-width, 320px);
+  background: var(--douji-bg);
+  color: var(--douji-text);
+  border: 1px solid var(--douji-border);
   border-radius: 0 !important;
-  box-shadow: var(--hk-shadow);
+  box-shadow: var(--douji-shadow);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: var(--hk-reading-size, 13px);
+  font-size: var(--douji-reading-size, 13px);
   line-height: 1.45;
   padding: 10px 12px;
   pointer-events: none;
@@ -70,42 +70,42 @@ body.nightMode #hk-tooltip-container:not(.hk-theme-light),
   text-align: left;
 }
 
-#hk-tooltip-container.hk-visible {
+#douji-tooltip-container.douji-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
 
-.hk-header {
+.douji-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--hk-divider);
+  border-bottom: 1px solid var(--douji-divider);
 }
 
-.hk-main-char {
-  font-size: var(--hk-char-size, 26px);
-  font-weight: var(--hk-char-weight, 700);
+.douji-main-char {
+  font-size: var(--douji-char-size, 26px);
+  font-weight: var(--douji-char-weight, 700);
   line-height: 1.1;
-  color: var(--hk-text);
+  color: var(--douji-text);
 }
 
-.hk-notice-message {
-  font-size: var(--hk-reading-size, 13px);
-  color: var(--hk-text-muted);
+.douji-notice-message {
+  font-size: var(--douji-reading-size, 13px);
+  color: var(--douji-text-muted);
   padding: 4px 0;
 }
 
-.hk-variants-list {
+.douji-variants-list {
   display: flex;
   flex-direction: column;
   gap: 3px;
   margin-bottom: 6px;
 }
 
-.hk-variant-row {
+.douji-variant-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -114,63 +114,63 @@ body.nightMode #hk-tooltip-container:not(.hk-theme-light),
   transition: background 0.1s ease;
 }
 
-.hk-variant-row.hk-highlighted {
-  background: var(--hk-highlight-bg);
-  border-left: 3px solid var(--hk-highlight-border);
+.douji-variant-row.douji-highlighted {
+  background: var(--douji-highlight-bg);
+  border-left: 3px solid var(--douji-highlight-border);
 }
 
-.hk-label {
+.douji-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--hk-text-muted);
+  color: var(--douji-text-muted);
   width: 48px;
   flex-shrink: 0;
 }
 
-.hk-char-val {
-  font-size: var(--hk-char-size, 22px);
-  font-weight: var(--hk-char-weight, 700);
+.douji-char-val {
+  font-size: var(--douji-char-size, 22px);
+  font-weight: var(--douji-char-weight, 700);
   line-height: 1.1;
-  color: var(--hk-text);
+  color: var(--douji-text);
 }
 
-.hk-variant-jp .hk-char-val {
-  font-family: var(--hk-jp-font, "Yu Gothic", Meiryo, "Hiragino Sans", sans-serif);
+.douji-variant-jp .douji-char-val {
+  font-family: var(--douji-jp-font, "Yu Gothic", Meiryo, "Hiragino Sans", sans-serif);
 }
 
-.hk-variant-sc .hk-char-val {
-  font-family: var(--hk-sc-font, "Microsoft YaHei", "PingFang SC", "Source Han Sans CN", sans-serif);
+.douji-variant-sc .douji-char-val {
+  font-family: var(--douji-sc-font, "Microsoft YaHei", "PingFang SC", "Source Han Sans CN", sans-serif);
 }
 
-.hk-variant-tc .hk-char-val {
-  font-family: var(--hk-tc-font, "Microsoft JhengHei", "PingFang TC", "Source Han Sans TC", sans-serif);
+.douji-variant-tc .douji-char-val {
+  font-family: var(--douji-tc-font, "Microsoft JhengHei", "PingFang TC", "Source Han Sans TC", sans-serif);
 }
 
-.hk-readings {
+.douji-readings {
   padding-top: 5px;
-  border-top: 1px solid var(--hk-divider);
+  border-top: 1px solid var(--douji-divider);
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: var(--hk-reading-size, 13px);
+  font-size: var(--douji-reading-size, 13px);
 }
 
-.hk-reading-row {
+.douji-reading-row {
   display: flex;
   align-items: baseline;
   gap: 6px;
 }
 
-.hk-reading-label {
+.douji-reading-label {
   font-size: 10px;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--hk-text-muted);
+  color: var(--douji-text-muted);
   width: 40px;
   flex-shrink: 0;
 }
 
-.hk-reading-val {
-  color: var(--hk-text);
+.douji-reading-val {
+  color: var(--douji-text);
   word-break: break-word;
 }

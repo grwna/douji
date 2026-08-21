@@ -1,6 +1,6 @@
 {
-  "name": "Hanzi Kanji Cross-Reference",
-  "package": "hanzi_kanji_crossref",
+  "name": "Douji",
+  "package": "douji",
   "version": "1.0.0",
   "min_anki_version": "2.1.20"
 }
