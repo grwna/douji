@@ -8,7 +8,7 @@
       theme: "auto",
       show_pinyin: true,
       show_readings: true,
-      popup_delay_ms: 50,
+      popup_delay_ms: 30,
       font_size: 14,
     },
     window.HANZI_KANJI_INITIAL_CONFIG || {}
@@ -18,9 +18,24 @@
   var highlightOverlay = null;
   var hoverTimer = null;
   var currentRequestId = 0;
-  var lastLookupChar = null;
-  var lastMousePos = { x: 0, y: 0 };
+  var activeChar = null;
   var activeCharRect = null;
+  var lastMousePos = { x: 0, y: 0 };
+
+  // Only match Hanzi / Kanji ideographs (ignores kana, punctuation, spaces, latin)
+  function isCJKIdeograph(char) {
+    if (!char) return false;
+    var code = char.codePointAt(0);
+    return (
+      (code >= 0x4e00 && code <= 0x9fff) ||
+      (code >= 0x3400 && code <= 0x4dbf) ||
+      (code >= 0x20000 && code <= 0x2a6df) ||
+      (code >= 0x2a700 && code <= 0x2b73f) ||
+      (code >= 0x2b740 && code <= 0x2b81f) ||
+      (code >= 0x2b820 && code <= 0x2ceaf) ||
+      (code >= 0xf900 && code <= 0xfaff)
+    );
+  }
 
   function checkModifier(e) {
     var mod = (config.modifier_key || "Shift").toLowerCase();
@@ -31,7 +46,6 @@
     return e.shiftKey;
   }
 
-  // Highlight overlay placed directly on the Anki card surface over the hovered character
   function getHighlightOverlay() {
     if (highlightOverlay && document.body.contains(highlightOverlay)) {
       return highlightOverlay;
@@ -46,6 +60,10 @@
   }
 
   function showHighlightOnCard(rect) {
+    if (!rect || rect.width === 0 || rect.height === 0) {
+      hideHighlightOnCard();
+      return;
+    }
     var overlay = getHighlightOverlay();
     overlay.style.left = rect.left + "px";
     overlay.style.top = rect.top + "px";
@@ -96,35 +114,34 @@
     }
 
     var text = textNode.textContent;
-    if (!text) return null;
+    if (!text || text.length === 0) return null;
 
-    var offsetsToTry = [];
-    if (offset < text.length) offsetsToTry.push(offset);
-    if (offset > 0 && offset <= text.length) offsetsToTry.push(offset - 1);
+    var candidates = [];
+    if (offset < text.length) candidates.push(offset);
+    if (offset > 0 && offset <= text.length) candidates.push(offset - 1);
 
-    for (var i = 0; i < offsetsToTry.length; i++) {
-      var testOff = offsetsToTry[i];
-      var char = text.charAt(testOff);
-      if (!char || char.trim() === "") continue;
+    for (var i = 0; i < candidates.length; i++) {
+      var off = candidates[i];
+      var char = text.charAt(off);
+      if (!isCJKIdeograph(char)) continue;
 
       try {
         var charRange = document.createRange();
-        charRange.setStart(textNode, testOff);
-        charRange.setEnd(textNode, testOff + 1);
+        charRange.setStart(textNode, off);
+        charRange.setEnd(textNode, off + 1);
         var rect = charRange.getBoundingClientRect();
 
-        // Exact character bounding box test
-        var padX = 6;
-        var padY = 4;
-        if (
-          x >= rect.left - padX &&
-          x <= rect.right + padX &&
-          y >= rect.top - padY &&
-          y <= rect.bottom + padY
-        ) {
-          return { char: char, rect: rect };
+        if (rect && rect.width > 0 && rect.height > 0) {
+          if (
+            x >= rect.left - 2 &&
+            x <= rect.right + 2 &&
+            y >= rect.top - 2 &&
+            y <= rect.bottom + 2
+          ) {
+            return { char: char, rect: rect };
+          }
         }
-      } catch (err) {
+      } catch (e) {
         // Fallback
       }
     }
@@ -152,18 +169,19 @@
       container.classList.remove("hk-visible");
     }
     hideHighlightOnCard();
-    lastLookupChar = null;
+    activeChar = null;
+    activeCharRect = null;
   }
 
   function positionTooltip(x, y, charRect) {
     if (!container) return;
 
-    var margin = 10;
+    var margin = 8;
     var docW = window.innerWidth;
     var docH = window.innerHeight;
     var rect = container.getBoundingClientRect();
-    var tooltipW = rect.width || 240;
-    var tooltipH = rect.height || 140;
+    var tooltipW = rect.width || 220;
+    var tooltipH = rect.height || 120;
 
     var left = charRect ? charRect.left : x + margin;
     var top = charRect ? charRect.bottom + margin : y + margin;
@@ -190,7 +208,7 @@
     createContainer();
 
     var char = data.char || "";
-    var isFound = data.found !== false;
+    var isFound = Boolean(data.jp && data.jp.length > 0 && data.found !== false);
 
     var html = "";
     html += '<div class="hk-header">';
@@ -198,12 +216,10 @@
     html += '</div>';
 
     if (!isFound) {
-      // Empty state
       var msg = data.message || "No character cross-reference found";
       html += '<div class="hk-notice-message">' + escapeHtml(msg) + '</div>';
     } else {
-      // Character found in mapping
-      var jp = (data.jp && data.jp.length) ? data.jp[0] : char;
+      var jp = data.jp[0];
       var sc = (data.sc && data.sc.length) ? data.sc[0] : char;
       var tc = (data.tc && data.tc.length) ? data.tc[0] : char;
 
@@ -286,24 +302,23 @@
       return;
     }
 
-    // Highlight the character directly on the card
     showHighlightOnCard(hit.rect);
     activeCharRect = hit.rect;
 
     var char = hit.char;
-    if (char === lastLookupChar) {
+    if (char === activeChar) {
       return;
     }
+
+    activeChar = char;
 
     if (hoverTimer) {
       clearTimeout(hoverTimer);
     }
 
     hoverTimer = setTimeout(function () {
-      lastLookupChar = char;
       currentRequestId++;
       var reqId = String(currentRequestId);
-
       var payload = JSON.stringify({ char: char, req_id: reqId });
 
       if (typeof pycmd !== "undefined") {
@@ -313,7 +328,7 @@
           }
         });
       }
-    }, config.popup_delay_ms || 50);
+    }, config.popup_delay_ms || 30);
   }
 
   function onKeyUp(e) {
