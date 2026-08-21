@@ -1,7 +1,7 @@
 """Bridge connecting Anki webview JS and Python backend."""
 import json
-import os
-from typing import Any, Tuple, Optional
+from pathlib import Path
+from typing import Any, Tuple
 from .engine import LookupEngine
 from .config import ConfigManager
 
@@ -14,31 +14,44 @@ class BridgeManager:
     def __init__(self, engine: LookupEngine, config_manager: ConfigManager):
         self.engine = engine
         self.config_manager = config_manager
-        self._web_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web"
-        )
-        self._css_cache: Optional[str] = None
-        self._js_cache: Optional[str] = None
+        self._web_dir = Path(__file__).resolve().parents[1] / "web"
+        self._file_cache: dict[str, str] = {}
 
-    def _get_css(self) -> str:
-        if self._css_cache is None:
-            css_path = os.path.join(self._web_dir, "tooltip.css")
-            if os.path.exists(css_path):
-                with open(css_path, "r", encoding="utf-8") as f:
-                    self._css_cache = f.read()
+    def _read_web_file(self, filename: str) -> str:
+        """Read and cache a file from the web directory."""
+        if filename not in self._file_cache:
+            path = self._web_dir / filename
+            if path.exists():
+                self._file_cache[filename] = path.read_text(encoding="utf-8")
             else:
-                self._css_cache = ""
-        return self._css_cache
+                self._file_cache[filename] = ""
+        return self._file_cache[filename]
 
-    def _get_js(self) -> str:
-        if self._js_cache is None:
-            js_path = os.path.join(self._web_dir, "tooltip.js")
-            if os.path.exists(js_path):
-                with open(js_path, "r", encoding="utf-8") as f:
-                    self._js_cache = f.read()
-            else:
-                self._js_cache = ""
-        return self._js_cache
+    @staticmethod
+    def _eval_js(context: Any, script: str) -> None:
+        """Send JS to the webview, trying context methods then falling back to mw."""
+        if hasattr(context, "eval"):
+            context.eval(script)
+        elif hasattr(context, "web") and hasattr(context.web, "eval"):
+            context.web.eval(script)
+        else:
+            try:
+                from aqt import mw
+                if mw and mw.reviewer and mw.reviewer.web:
+                    mw.reviewer.web.eval(script)
+            except Exception:
+                pass
+
+    @staticmethod
+    def _is_reviewer(context: Any) -> bool:
+        """Check whether the webview context belongs to the Anki reviewer."""
+        try:
+            from aqt import mw
+            if mw and getattr(mw, "reviewer", None) is not None:
+                return context is mw.reviewer or context is getattr(mw.reviewer, "web", None)
+        except Exception:
+            pass
+        return "Reviewer" in type(context).__name__
 
     def on_js_message(self, handled: Tuple[bool, Any], message: str, context: Any) -> Tuple[bool, Any]:
         """Process incoming bridge messages from JS."""
@@ -66,20 +79,7 @@ class BridgeManager:
                 f" window.HanziKanjiBridge.onResult({result_json}, {safe_req_id});"
                 f" }}"
             )
-
-            # Evaluate callback on the webview context
-            if hasattr(context, "eval"):
-                context.eval(callback_script)
-            elif hasattr(context, "web") and hasattr(context.web, "eval"):
-                context.web.eval(callback_script)
-            else:
-                try:
-                    from aqt import mw
-                    if mw and mw.reviewer and mw.reviewer.web:
-                        mw.reviewer.web.eval(callback_script)
-                except Exception:
-                    pass
-
+            self._eval_js(context, callback_script)
             return (True, result)
 
         if subcommand.startswith("config:"):
@@ -90,53 +90,43 @@ class BridgeManager:
                 f" window.HanziKanjiBridge.onConfig({conf_json});"
                 f" }}"
             )
-            if hasattr(context, "eval"):
-                context.eval(callback_script)
-            elif hasattr(context, "web") and hasattr(context.web, "eval"):
-                context.web.eval(callback_script)
+            self._eval_js(context, callback_script)
             return (True, conf)
 
         return handled
 
     def inject_assets(self, web_content: Any, context: Any) -> None:
         """Inject CSS and JS into reviewer webview content."""
-        is_reviewer = False
-        context_name = getattr(context, "__class__", {}).__name__ if hasattr(context, "__class__") else ""
-        if "Reviewer" in str(context_name) or "Reviewer" in str(type(context)):
-            is_reviewer = True
+        if not self._is_reviewer(context):
+            return
 
-        try:
-            from aqt import mw
-            if mw and getattr(mw, "reviewer", None) is not None:
-                if context is mw.reviewer or context is getattr(mw.reviewer, "web", None):
-                    is_reviewer = True
-        except Exception:
-            pass
+        css = self._read_web_file("tooltip.css")
+        js = self._read_web_file("tooltip.js")
+        config_json = json.dumps(self.config_manager.all(), ensure_ascii=False)
 
-        if is_reviewer:
-            css = self._get_css()
-            js = self._get_js()
-            config_json = json.dumps(self.config_manager.all(), ensure_ascii=False)
-
-            init_script = f"""
-            <style id="hanzi-kanji-styles">
-            {css}
-            </style>
-            <script id="hanzi-kanji-script">
-            window.HANZI_KANJI_INITIAL_CONFIG = {config_json};
-            {js}
-            </script>
-            """
-            if hasattr(web_content, "head"):
-                web_content.head += init_script
+        init_script = f"""
+        <style id="hanzi-kanji-styles">
+        {css}
+        </style>
+        <script id="hanzi-kanji-script">
+        window.HANZI_KANJI_INITIAL_CONFIG = {config_json};
+        {js}
+        </script>
+        """
+        if hasattr(web_content, "head"):
+            web_content.head += init_script
 
     def on_card_shown(self) -> None:
-        """Ensure scripts are active when a card question or answer is displayed."""
+        """Ensure scripts are active when a card question or answer is displayed.
+
+        Only injects a lightweight bootstrap check — the full JS bundle is loaded
+        once via inject_assets. This avoids re-evaluating the entire tooltip.js
+        on every card flip.
+        """
         try:
             from aqt import mw
             if mw and mw.reviewer and mw.reviewer.web:
-                js = self._get_js()
-                css = self._get_css()
+                css = self._read_web_file("tooltip.css")
                 config_json = json.dumps(self.config_manager.all(), ensure_ascii=False)
                 ensure_script = (
                     f"if (!document.getElementById('hanzi-kanji-styles')) {{"
@@ -148,7 +138,9 @@ class BridgeManager:
                     f"if (!window.HANZI_KANJI_INITIAL_CONFIG) {{"
                     f"  window.HANZI_KANJI_INITIAL_CONFIG = {config_json};"
                     f"}}"
-                    f"{js}"
+                    f"if (!window.HanziKanjiBridge) {{"
+                    f"  {self._read_web_file('tooltip.js')}"
+                    f"}}"
                 )
                 mw.reviewer.web.eval(ensure_script)
         except Exception:

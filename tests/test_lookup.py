@@ -1,9 +1,10 @@
 """Unit tests for lookup engine and variant mapping provider."""
-import os
 import sys
 import unittest
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 from backend.engine import LookupEngine
 from backend.providers.variant_provider import VariantMappingProvider
@@ -12,11 +13,7 @@ from backend.providers.variant_provider import VariantMappingProvider
 class TestLookupEngine(unittest.TestCase):
 
     def setUp(self):
-        data_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "data",
-            "char_variants.json",
-        )
+        data_path = str(_PROJECT_ROOT / "data" / "char_variants.json")
         self.provider = VariantMappingProvider(data_path=data_path)
         self.engine = LookupEngine(providers=[self.provider])
 

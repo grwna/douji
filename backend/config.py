@@ -1,6 +1,8 @@
 """Configuration manager for Anki add-on."""
 from typing import Any, Dict
 
+_UNSET = object()
+
 DEFAULT_CONFIG: Dict[str, Any] = {
     "modifier_key": "Shift",
     "theme": "auto",
@@ -32,8 +34,10 @@ class ConfigManager:
             if user_conf:
                 self._config.update(user_conf)
 
-    def get(self, key: str, default: Any = None) -> Any:
-        return self._config.get(key, default if default is not None else DEFAULT_CONFIG.get(key))
+    def get(self, key: str, default: Any = _UNSET) -> Any:
+        if default is _UNSET:
+            return self._config.get(key, DEFAULT_CONFIG.get(key))
+        return self._config.get(key, default)
 
     def all(self) -> Dict[str, Any]:
         return dict(self._config)

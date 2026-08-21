@@ -1,6 +1,6 @@
 """Variant mapping lookup provider."""
 import json
-import os
+from pathlib import Path
 from typing import Optional, Dict, Any
 from .base import BaseLookupProvider
 
@@ -10,15 +10,15 @@ class VariantMappingProvider(BaseLookupProvider):
 
     def __init__(self, data_path: Optional[str] = None):
         if data_path is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            data_path = os.path.join(base_dir, "data", "char_variants.json")
+            data_path = str(Path(__file__).resolve().parents[2] / "data" / "char_variants.json")
         self.data_path = data_path
         self._data: Dict[str, Any] = {}
         self._load_data()
 
     def _load_data(self) -> None:
-        if os.path.exists(self.data_path):
-            with open(self.data_path, "r", encoding="utf-8") as f:
+        path = Path(self.data_path)
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
                 self._data = json.load(f)
 
     def lookup(self, char: str) -> Optional[Dict[str, Any]]:
@@ -39,13 +39,8 @@ class VariantMappingProvider(BaseLookupProvider):
             all_identical = (jp_val == sc_val == tc_val)
             all_different = (jp_val != sc_val and jp_val != tc_val and sc_val != tc_val)
 
-            hovered_variant = None
-            if char in jp_list:
-                hovered_variant = "jp"
-            elif char in sc_list:
-                hovered_variant = "sc"
-            elif char in tc_list:
-                hovered_variant = "tc"
+            variants = {"jp": jp_list, "sc": sc_list, "tc": tc_list}
+            hovered_variant = next((k for k, v in variants.items() if char in v), None)
 
             return {
                 "found": True,

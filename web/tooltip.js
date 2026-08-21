@@ -56,7 +56,7 @@
     var c = createContainer();
     if (!c) return;
 
-    var charSize = (config.character_font_size || config.font_size || 24) + "px";
+    var charSize = (config.character_font_size || 24) + "px";
     var readingSize = (config.reading_font_size || 13) + "px";
     var weight = config.bold_characters === true ? "700" : "400";
 
@@ -289,9 +289,10 @@
       html += '</div>';
 
       var hasPinyin = config.show_pinyin && data.pinyin && data.pinyin.length > 0;
-      var hasReadings = config.show_readings && ((data.onyomi && data.onyomi.length > 0) || (data.kunyomi && data.kunyomi.length > 0));
+      var onyomi = config.show_readings && data.onyomi && data.onyomi.length > 0 ? data.onyomi : null;
+      var kunyomi = config.show_readings && data.kunyomi && data.kunyomi.length > 0 ? data.kunyomi : null;
 
-      if (hasPinyin || hasReadings) {
+      if (hasPinyin || onyomi || kunyomi) {
         html += '<div class="hk-readings">';
         if (hasPinyin) {
           html += '<div class="hk-reading-row">';
@@ -299,14 +300,10 @@
           html += '  <span class="hk-reading-val">' + escapeHtml(data.pinyin.join(", ")) + '</span>';
           html += '</div>';
         }
-        if (hasReadings) {
+        if (onyomi || kunyomi) {
           var readingsParts = [];
-          if (data.onyomi && data.onyomi.length > 0) {
-            readingsParts.push("On: " + data.onyomi.join(", "));
-          }
-          if (data.kunyomi && data.kunyomi.length > 0) {
-            readingsParts.push("Kun: " + data.kunyomi.join(", "));
-          }
+          if (onyomi) readingsParts.push("On: " + onyomi.join(", "));
+          if (kunyomi) readingsParts.push("Kun: " + kunyomi.join(", "));
           html += '<div class="hk-reading-row">';
           html += '  <span class="hk-reading-label">Kana</span>';
           html += '  <span class="hk-reading-val">' + escapeHtml(readingsParts.join(" | ")) + '</span>';
