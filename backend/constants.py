@@ -9,7 +9,7 @@ DATA_DIR = ROOT_DIR / "data"
 UI_DIR = ROOT_DIR / "ui"
 
 # Core File Paths
-CHAR_VARIANTS_PATH = DATA_DIR / "char_variants.json"
+CHAR_VARIANTS_PATH = DATA_DIR / "mappings.json"
 TOOLTIP_CSS_PATH = UI_DIR / "tooltip.css"
 TOOLTIP_JS_PATH = UI_DIR / "tooltip.js"
 

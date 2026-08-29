@@ -110,9 +110,9 @@ For detailed explanations of all settings, see [`config.md`](docs/CONFIG.md).
 
 ## Future Plans
 
-- **Dictionary & Definitions**: Direct integration with external dictionary providers (e.g., CEDICT, JMdict, Jitendex) for on-hover definitions and vocabulary breakdown.
-- **Audio pronunciation**: Native audio playback support for Pinyin and Japanese readings.
-- **Stroke order diagrams**: Visual stroke order diagrams for Kanji/Hanzi comparisons.
+- Dictionary & Definitions**: Direct integration with external dictionary providers (e.g., CEDICT, JMdict, Jitendex) for on-hover definitions and vocabulary breakdown.
+- Native audio playback support for Pinyin and Japanese readings.
+- Visual stroke order diagrams for Kanji/Hanzi comparisons.
 
 ---
 

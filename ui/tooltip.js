@@ -28,7 +28,7 @@
   var activeCharRect = null;
   var lastMousePos = { x: 0, y: 0 };
 
-  // Only match Hanzi / Kanji ideographs (ignores kana, punctuation, spaces, latin)
+  // Only match Hanzi / Kanji ideographs 
   function isCJKIdeograph(char) {
     if (!char) return false;
     var code = char.codePointAt(0);
@@ -78,7 +78,7 @@
       c.style.setProperty("--douji-max-width", config.popup_max_width + "px");
     }
 
-    // Explicit Theme Switching (Light / Dark / Auto)
+    // Themes
     c.classList.remove("douji-theme-light", "douji-theme-dark");
     var theme = (config.theme || "auto").toLowerCase();
     if (theme === "light") {

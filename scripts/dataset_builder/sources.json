@@ -1,0 +1,16 @@
+{
+  "opencc": {
+    "base_url": "https://raw.githubusercontent.com/BYVoid/OpenCC/master/data/dictionary",
+    "files": {
+      "st_characters": "STCharacters.txt",
+      "ts_characters": "TSCharacters.txt",
+      "jp_variants": "JPVariants.txt"
+    }
+  },
+  "unihan": {
+    "url": "https://www.unicode.org/Public/UNIDATA/Unihan.zip",
+    "extract_files": [
+      "Unihan_Readings.txt"
+    ]
+  }
+}
