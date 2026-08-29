@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tone-marked Mandarin Pinyin readings.
 - Japanese On-yomi and Kun-yomi Kana readings.
 - Visual accent highlighting on hovered character row when all three regional forms differ.
-- Precompiled database of 9,688 character clusters covering common Hanzi and Kanji (`char_variants.json`).
+- Precompiled database of 9,688 character clusters covering common Hanzi and Kanji.
 - Pluggable backend lookup engine architecture (`BaseLookupProvider`, `LookupEngine`, `VariantMappingProvider`).
 - Configurable settings via Anki Add-on Manager:
   - `modifier_key` (Shift, Alt, Control, None)

@@ -16,13 +16,13 @@ from dataset_builder import (
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-OUTPUT_PATH = PROJECT_ROOT / "data" / "char_variants.json"
+OUTPUT_PATH = PROJECT_ROOT / "data" / "dataset.json"
 SOURCES_DIR = SCRIPT_DIR / "sources"
 CONFIG_PATH = SCRIPT_DIR / "dataset_builder" / "sources.json"
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build char_variants.json dataset")
+    parser = argparse.ArgumentParser(description="Build dataset.json")
     parser.add_argument("--keep-sources", action="store_true", help="Keep downloaded raw sources")
     args = parser.parse_args()
 

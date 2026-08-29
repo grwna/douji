@@ -14,12 +14,12 @@ project/
 │   ├── bridge.py            # BridgeManager — JS↔Python bridge + asset injection
 │   └── providers/
 │       ├── base.py          # BaseLookupProvider (ABC)
-│       └── variant_provider.py  # Reads char_variants.json, does lookups
+│       └── variant_provider.py  # Reads dataset, does lookups
 ├── ui/
 │   ├── tooltip.js           # Frontend IIFE — all tooltip logic
 │   └── tooltip.css          # Tooltip styles
 ├── data/
-│   └── char_variants.json   # Precompiled character variant data (~1MB)
+│   └── dataset.json         # Precompiled character variant data (~1MB)
 ├── tests/
 │   └── tests.py             # Unit tests 
 └── docs/

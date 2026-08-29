@@ -2,14 +2,14 @@ import json
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
 from .base import BaseLookupProvider
-from ..constants import CHAR_VARIANTS_PATH
+from ..constants import DATASET_PATH
 
 
 class VariantMappingProvider(BaseLookupProvider):
     """Provides cross-reference character variant data from precompiled JSON."""
 
     def __init__(self, data_path: Optional[Union[str, Path]] = None):
-        self.data_path = Path(data_path) if data_path is not None else CHAR_VARIANTS_PATH
+        self.data_path = Path(data_path) if data_path is not None else DATASET_PATH
         self._data: Dict[str, Any] = {}
         self._load_data()
 

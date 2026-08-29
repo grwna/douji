@@ -1,6 +1,6 @@
 # Character Mapping Data
 
-This document describes how `char_variants.json` is built from open-source linguistic datasets, and how to rebuild it.
+This document describes how `dataset.json` is built from open-source linguistic datasets, and how to rebuild it.
 
 ## Data Sources
 
@@ -75,7 +75,7 @@ Every character appearing in any cluster's `jp`, `sc`, or `tc` list becomes a to
 
 ### Step 5: Write Output
 
-The result is written to `data/char_variants.json` as a single-line minified JSON file.
+The result is written to `data/dataset.json` as a single-line minified JSON file.
 
 ## Output Format
 

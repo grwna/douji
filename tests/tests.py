@@ -12,7 +12,7 @@ from backend.constants import (
     ROOT_DIR,
     DATA_DIR,
     UI_DIR,
-    CHAR_VARIANTS_PATH,
+    DATASET_PATH,
     TOOLTIP_CSS_PATH,
     TOOLTIP_JS_PATH,
     ADDON_NAME,
@@ -27,7 +27,7 @@ class TestConstants(unittest.TestCase):
         self.assertTrue(ROOT_DIR.exists(), f"ROOT_DIR does not exist: {ROOT_DIR}")
         self.assertTrue(DATA_DIR.exists(), f"DATA_DIR does not exist: {DATA_DIR}")
         self.assertTrue(UI_DIR.exists(), f"UI_DIR does not exist: {UI_DIR}")
-        self.assertTrue(CHAR_VARIANTS_PATH.exists(), f"CHAR_VARIANTS_PATH does not exist: {CHAR_VARIANTS_PATH}")
+        self.assertTrue(DATASET_PATH.exists(), f"DATASET_PATH does not exist: {DATASET_PATH}")
         self.assertTrue(TOOLTIP_CSS_PATH.exists(), f"TOOLTIP_CSS_PATH does not exist: {TOOLTIP_CSS_PATH}")
         self.assertTrue(TOOLTIP_JS_PATH.exists(), f"TOOLTIP_JS_PATH does not exist: {TOOLTIP_JS_PATH}")
 
