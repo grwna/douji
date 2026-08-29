@@ -34,5 +34,5 @@
 ### `popup_delay_ms` (integer)
 - Hover debounce delay in milliseconds. Default: `30`.
 
-### `show_pinyin` & `show_readings` (boolean)
-- Toggles for displaying Pinyin and Japanese Kana readings. Defaults: `true`.
+### `show_pinyin`, `show_readings`, `show_meanings` (boolean)
+- Toggles for displaying Mandarin Pinyin, Japanese Kana, and English meanings. Defaults: `true`.

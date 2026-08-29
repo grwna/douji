@@ -4,7 +4,7 @@
     "files": {
       "st_characters": "STCharacters.txt",
       "ts_characters": "TSCharacters.txt",
-      "jp_variants": "JPVariants.txt"
+      "jp_variants": "JPShinjitaiCharacters.txt"
     }
   },
   "unihan": {

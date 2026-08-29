@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- English definitions derived from Unihan (`kDefinition`) to character tooltip.
+- `show_meanings` config option to toggle definition display.
+
 ## [1.0.0] - 2026-08-21
 
 ### Added

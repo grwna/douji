@@ -31,4 +31,5 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "popup_max_width": 320,
     "show_pinyin": True,
     "show_readings": True,
+    "show_meanings": True,
 }

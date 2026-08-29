@@ -49,6 +49,7 @@ class VariantMappingProvider(BaseLookupProvider):
                 "pinyin": entry.get("pinyin", []),
                 "onyomi": entry.get("onyomi", []),
                 "kunyomi": entry.get("kunyomi", []),
+                "meaning": entry.get("meaning", ""),
                 "all_identical": all_identical,
                 "all_different": all_different,
                 "hovered_variant": hovered_variant,

@@ -10,5 +10,6 @@
   "popup_min_width": 220,
   "popup_max_width": 320,
   "show_pinyin": true,
-  "show_readings": true
+  "show_readings": true,
+  "show_meanings": true
 }

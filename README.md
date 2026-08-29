@@ -69,6 +69,7 @@ Customize behavior, keys, fonts, and appearance via **Tools** â†’ **Add-ons** â†
 | `popup_max_width` | integer | `320` | Maximum tooltip width in pixels. |
 | `show_pinyin` | boolean | `true` | Toggle Mandarin Pinyin display. |
 | `show_readings` | boolean | `true` | Toggle Japanese Kana readings display. |
+| `show_meanings` | boolean | `true` | Toggle English meanings display. |
 
 > **Note:** `"None"` triggers on every hover without any key pressed, which may cause popup spam while reading.
 
@@ -105,6 +106,7 @@ For detailed explanations of all settings, see [`config.md`](docs/CONFIG.md).
 - Requires the desktop Qt webview reviewer.
 - Covers 9,688 character clusters from common Japanese Joyo/Jinmeiyo and Chinese standard character sets. Extremely rare or archaic historical variants may not be mapped.
 - Only shows characters with equivalence in all three variants. This means it can't be used to check Simplified-Traditional Mandarin only.
+- Definitions are unified using the Unihan database and provide a generalized English meaning. They do not differentiate between distinct Chinese and Japanese usages of the same character.
 
 ---
 

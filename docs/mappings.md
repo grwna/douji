@@ -4,12 +4,12 @@ This document describes how `dataset.json` is built from open-source linguistic 
 
 ## Data Sources
 
-The dataset is compiled from three open-source linguistic databases:
+The dataset is compiled from two open-source linguistic databases:
 
-| Source | Files Used | What It Provides |
-|---|---|---|
-| [OpenCC](https://github.com/BYVoid/OpenCC) | `STCharacters.txt`, `TSCharacters.txt`, `JPVariants.txt` | Character equivalence mappings across Simplified Chinese, Traditional Chinese, and Japanese Shinjitai/Kyūjitai |
-| [Unicode Unihan](https://www.unicode.org/Public/UNIDATA/Unihan.zip) | `Unihan_Readings.txt` | Mandarin Pinyin (`kMandarin`), Japanese On'yomi (`kJapaneseOn`), Japanese Kun'yomi (`kJapaneseKun`) |
+| Dataset | Source Name | Role |
+| :--- | :--- | :--- |
+| OpenCC | `STCharacters.txt`, `TSCharacters.txt`, `JPVariants.txt` | Character equivalence mappings across Simplified Chinese, Traditional Chinese, and Japanese Shinjitai/Kyūjitai |
+| Unihan | `Unihan_Readings.txt` | Core readings (Mandarin, Japanese On/Kun) and English definitions |
 
 ### OpenCC Tables
 
@@ -60,14 +60,15 @@ Each character in a cluster is assigned regional roles based on which OpenCC tab
 
 Characters not appearing in any table as a source are assigned to whichever roles are still empty (they're identical across standards).
 
-### Step 3: Enrich with Readings
+### Step 3: Enrich with Readings and Meanings
 
 For every character in each cluster, `Unihan_Readings.txt` is queried for:
 - Pinyin (from `kMandarin`)
 - On'yomi (from `kJapaneseOn`, converted from romaji → Katakana)
 - Kun'yomi (from `kJapaneseKun`, converted from romaji → Hiragana with okurigana dots preserved)
+- English Meaning (from `kDefinition`)
 
-Readings from all characters in the cluster are merged and deduplicated.
+Readings and meanings from all characters in the cluster are merged and deduplicated.
 
 ### Step 4: Build Inverted Index
 
@@ -89,7 +90,8 @@ Each top-level key is a single character. The value contains the full cluster:
     "tc": ["氣"],
     "pinyin": ["qì", "qǐ"],
     "onyomi": ["キ", "ケ"],
-    "kunyomi": ["いき"]
+    "kunyomi": ["いき"],
+    "meaning": "air, gas, steam, vapor; spirit"
   }
 }
 ```
@@ -98,6 +100,7 @@ Each top-level key is a single character. The value contains the full cluster:
 - `pinyin` — Tone-marked Mandarin readings
 - `onyomi` — Japanese On readings in Katakana
 - `kunyomi` — Japanese Kun readings in Hiragana (with okurigana dots)
+- `meaning` — Unified English definition string
 - All list fields may be empty arrays
 
 ## How to Rebuild

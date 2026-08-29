@@ -139,7 +139,8 @@ Unicode Pinyin data (tone-marked Mandarin).
     "tc": ["氣"],
     "pinyin": ["qì", "qǐ"],
     "onyomi": ["キ", "ケ"],
-    "kunyomi": ["いき"]
+    "kunyomi": ["いき"],
+    "meaning": "air, gas, steam, vapor; spirit"
   }
 }
 ```
@@ -195,6 +196,7 @@ the config editor UI). Documented for end users in `config.md`.
 | `popup_max_width` | int | `320` | Maximum tooltip width in px |
 | `show_pinyin` | bool | `true` | Show Mandarin Pinyin reading row |
 | `show_readings` | bool | `true` | Show Japanese On-yomi / Kun-yomi reading row |
+| `show_meanings` | bool | `true` | Show English meaning row |
 
 Config is passed to JS as `window.DOUJI_INITIAL_CONFIG` at injection time.
 The JS `onConfig` bridge handler can update it at runtime without a page reload.

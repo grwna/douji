@@ -12,6 +12,7 @@ from dataset_builder import (
     load_sources_config,
     parse_opencc_file,
     parse_unihan_readings,
+    parse_unihan_definitions,
 )
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -33,7 +34,7 @@ def main() -> None:
     opencc_cfg = config.get("opencc", {}).get("files", {})
     st_path = SOURCES_DIR / opencc_cfg.get("st_characters", "STCharacters.txt")
     ts_path = SOURCES_DIR / opencc_cfg.get("ts_characters", "TSCharacters.txt")
-    jp_path = SOURCES_DIR / opencc_cfg.get("jp_variants", "JPVariants.txt")
+    jp_path = SOURCES_DIR / opencc_cfg.get("jp_variants", "JPShinjitaiCharacters.txt")
     unihan_path = SOURCES_DIR / "Unihan_Readings.txt"
 
     print("\n--- 2. Building variant clusters ---")
@@ -52,11 +53,13 @@ def main() -> None:
 
     print(f"Total clusters: {len(classified_clusters)}")
 
-    print("\n--- 3. Enriching with readings ---")
+    print("\n--- 3. Enriching with readings and definitions ---")
     readings = parse_unihan_readings(unihan_path)
+    definitions = parse_unihan_definitions(unihan_path)
+    
     output = {}
     for cluster_data in classified_clusters:
-        enriched = enrich_cluster(cluster_data, readings)
+        enriched = enrich_cluster(cluster_data, readings, definitions)
         all_chars = set(enriched["jp"] + enriched["sc"] + enriched["tc"])
         for ch in all_chars:
             output[ch] = enriched
