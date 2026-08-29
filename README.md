@@ -101,9 +101,10 @@ For detailed explanations of all settings, see [`config.md`](docs/CONFIG.md).
 
 ## Known Limitations
 
-- **Single-character lookup**: Cross-referencing operates on individual CJK ideographs rather than multi-character compound words.
-- **Desktop Anki only**: Requires the desktop Qt webview reviewer.
-- **Dataset coverage**: Covers 9,688 character clusters from common Japanese Joyo/Jinmeiyo and Chinese standard character sets; extremely rare or archaic historical variants may not be mapped.
+- Cross-referencing operates on individual CJK ideographs rather than multi-character compound words.
+- Requires the desktop Qt webview reviewer.
+- Covers 9,688 character clusters from common Japanese Joyo/Jinmeiyo and Chinese standard character sets. Extremely rare or archaic historical variants may not be mapped.
+- Only shows characters with equivalence in all three variants. This means it can't be used to check Simplified-Traditional Mandarin only.
 
 ---
 
