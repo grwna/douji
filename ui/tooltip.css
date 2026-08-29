@@ -17,7 +17,7 @@
   --douji-divider: #e9ecef;
 }
 
-/* Anki Dark / Night Mode Palette (Neutral Grey, no purple/blue tint) */
+/* Anki Dark Theme Palette */
 body.night_mode #douji-tooltip-container:not(.douji-theme-light),
 body.nightMode #douji-tooltip-container:not(.douji-theme-light),
 .night_mode #douji-tooltip-container:not(.douji-theme-light),
@@ -37,7 +37,7 @@ body.nightMode #douji-tooltip-container:not(.douji-theme-light),
   --douji-divider: #3a3a3c;
 }
 
-/* Yomitan-style character highlight overlay (square corners) */
+/* Yomitan-style character highlight overlay */
 #douji-highlight-overlay {
   position: fixed !important;
   z-index: 2147483646 !important;
@@ -47,7 +47,7 @@ body.nightMode #douji-tooltip-container:not(.douji-theme-light),
   display: none;
 }
 
-/* Popup container with sharp square corners */
+/* Popup container */
 #douji-tooltip-container {
   position: fixed !important;
   z-index: 2147483647 !important;

@@ -8,13 +8,39 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 from backend.engine import LookupEngine
 from backend.providers.variant_provider import VariantMappingProvider
+from backend.constants import (
+    ROOT_DIR,
+    DATA_DIR,
+    UI_DIR,
+    CHAR_VARIANTS_PATH,
+    TOOLTIP_CSS_PATH,
+    TOOLTIP_JS_PATH,
+    ADDON_NAME,
+    BRIDGE_PREFIX,
+    DEFAULT_CONFIG,
+)
+
+
+class TestConstants(unittest.TestCase):
+
+    def test_paths_exist(self):
+        self.assertTrue(ROOT_DIR.exists(), f"ROOT_DIR does not exist: {ROOT_DIR}")
+        self.assertTrue(DATA_DIR.exists(), f"DATA_DIR does not exist: {DATA_DIR}")
+        self.assertTrue(UI_DIR.exists(), f"UI_DIR does not exist: {UI_DIR}")
+        self.assertTrue(CHAR_VARIANTS_PATH.exists(), f"CHAR_VARIANTS_PATH does not exist: {CHAR_VARIANTS_PATH}")
+        self.assertTrue(TOOLTIP_CSS_PATH.exists(), f"TOOLTIP_CSS_PATH does not exist: {TOOLTIP_CSS_PATH}")
+        self.assertTrue(TOOLTIP_JS_PATH.exists(), f"TOOLTIP_JS_PATH does not exist: {TOOLTIP_JS_PATH}")
+
+    def test_addon_metadata_and_defaults(self):
+        self.assertEqual(ADDON_NAME, "douji")
+        self.assertEqual(BRIDGE_PREFIX, "douji:")
+        self.assertIn("modifier_key", DEFAULT_CONFIG)
 
 
 class TestLookupEngine(unittest.TestCase):
 
     def setUp(self):
-        data_path = str(_PROJECT_ROOT / "data" / "char_variants.json")
-        self.provider = VariantMappingProvider(data_path=data_path)
+        self.provider = VariantMappingProvider()
         self.engine = LookupEngine(providers=[self.provider])
 
     def test_all_different_characters(self):

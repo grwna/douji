@@ -1,22 +1,8 @@
 """Configuration manager for Anki add-on."""
 from typing import Any, Dict
+from .constants import DEFAULT_CONFIG, ADDON_NAME
 
 _UNSET = object()
-
-DEFAULT_CONFIG: Dict[str, Any] = {
-    "modifier_key": "Shift",
-    "theme": "auto",
-    "popup_delay_ms": 30,
-    "character_font_size": 24,
-    "reading_font_size": 13,
-    "bold_characters": False,
-    "japanese_font": "Yu Gothic, Meiryo, 'Hiragino Sans', sans-serif",
-    "chinese_font": "'Microsoft YaHei', 'PingFang SC', 'Source Han Sans CN', sans-serif",
-    "popup_min_width": 220,
-    "popup_max_width": 320,
-    "show_pinyin": True,
-    "show_readings": True,
-}
 
 
 class ConfigManager:
