@@ -66,7 +66,7 @@ def parse_unihan_definitions(path: Path) -> Dict[str, str]:
 
 import re
 
-def clean_definition(raw_text: str, max_tokens: int = 4) -> str:
+def clean_definition(raw_text: str, max_tokens: int = 4, max_words: int = 3) -> str:
     if not raw_text:
         return ""
     cleaned = re.sub(r'\(.*?\)', '', raw_text)
@@ -76,6 +76,16 @@ def clean_definition(raw_text: str, max_tokens: int = 4) -> str:
     for t in raw_tokens:
         tok = t.strip()
         if not tok:
+            continue
+        # 1. Reject if contains any uppercase letters
+        if re.search(r'[A-Z]', tok):
+            continue
+        # 2. Reject if contains CJK characters
+        if re.search(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]', tok):
+            continue
+        # 3. Reject if phrase contains more than max_words
+        words = tok.split()
+        if len(words) > max_words:
             continue
         key = tok.lower()
         if key not in seen:
@@ -113,7 +123,7 @@ def enrich_cluster(
                     kunyomi_set.append(converted)
         if ch in definitions:
             m = definitions[ch]
-            # Since definitions might be slightly different or duplicate, we'll collect them
+            # definitions might be slightly different or duplicate, collect them
             if m not in meanings_set:
                 meanings_set.append(m)
 

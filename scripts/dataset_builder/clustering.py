@@ -87,35 +87,43 @@ def classify_cluster(
     st_map: Dict[str, List[str]],
     ts_map: Dict[str, List[str]],
     jp_map: Dict[str, List[str]],
+    readings: Dict[str, Dict[str, List[str]]] = None,
 ) -> Dict[str, List[str]]:
-    jp_chars = set()
-    sc_chars = set()
-    tc_chars = set()
+    valid_chars = {ch for ch in chars if is_cjk(ch)}
+    if not valid_chars:
+        return {"jp": [], "sc": [], "tc": []}
 
-    for ch in chars:
-        if not is_cjk(ch):
-            continue
-        if ch in jp_map:
-            jp_chars.add(ch)
-        if ch in st_map:
-            sc_chars.add(ch)
-        if ch in ts_map:
-            tc_chars.add(ch)
+    st_sources = set(st_map.keys())
+    st_targets = {t for targets in st_map.values() for t in targets}
+    ts_sources = set(ts_map.keys())
+    ts_targets = {t for targets in ts_map.values() for t in targets}
+    jp_sources = set(jp_map.keys())
+    jp_targets = {t for targets in jp_map.values() for t in targets}
 
-    unmapped = chars - jp_chars - sc_chars - tc_chars
-    for ch in unmapped:
-        if is_cjk(ch):
-            if not jp_chars:
-                jp_chars.add(ch)
-            if not sc_chars:
-                sc_chars.add(ch)
-            if not tc_chars:
-                tc_chars.add(ch)
+    sc_chars = (valid_chars & st_sources) | (valid_chars & ts_targets)
+    tc_chars = (valid_chars & ts_sources) | (valid_chars & st_targets) | (valid_chars & jp_targets)
+    jp_chars = set(valid_chars & jp_sources)
 
-    if not jp_chars and tc_chars:
-        jp_chars = set(tc_chars)
-    if not tc_chars and jp_chars:
-        tc_chars = set(jp_chars)
+    if not jp_chars:
+        kun_chars = {ch for ch in valid_chars if readings and ch in readings and readings[ch].get("kJapaneseKun")}
+        on_chars = {ch for ch in valid_chars if readings and ch in readings and readings[ch].get("kJapaneseOn")}
+        if sc_chars & kun_chars:
+            jp_chars = sc_chars & kun_chars
+        elif sc_chars & on_chars:
+            jp_chars = sc_chars & on_chars
+        elif kun_chars:
+            jp_chars = set(kun_chars)
+        elif sc_chars:
+            jp_chars = set(sc_chars)
+        elif tc_chars:
+            jp_chars = set(tc_chars)
+        else:
+            jp_chars = set(valid_chars)
+
+    if not sc_chars:
+        sc_chars = set(jp_chars) if jp_chars else set(valid_chars)
+    if not tc_chars:
+        tc_chars = set(jp_chars) if jp_chars else set(valid_chars)
 
     return {
         "jp": sorted(jp_chars),

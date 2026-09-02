@@ -8,14 +8,14 @@ The dataset is compiled from two open-source linguistic databases:
 
 | Dataset | Source Name | Role |
 | :--- | :--- | :--- |
-| OpenCC | `STCharacters.txt`, `TSCharacters.txt`, `JPVariants.txt` | Character equivalence mappings across Simplified Chinese, Traditional Chinese, and Japanese Shinjitai/Kyūjitai |
+| OpenCC | `STCharacters.txt`, `TSCharacters.txt`, `JPShinjitaiCharacters.txt` | Character equivalence mappings across Simplified Chinese, Traditional Chinese, and Japanese Shinjitai/Kyūjitai |
 | Unihan | `Unihan_Readings.txt` | Core readings (Mandarin, Japanese On/Kun) and English definitions |
 
 ### OpenCC Tables
 
 - **`STCharacters.txt`** — Simplified → Traditional character mappings. Each line maps one simplified character to one or more traditional equivalents.
 - **`TSCharacters.txt`** — Traditional → Simplified character mappings. The reverse direction.
-- **`JPVariants.txt`** — Japanese Shinjitai ↔ Traditional (Kyūjitai) mappings. Maps modern Japanese simplified kanji to their traditional forms.
+- **`JPShinjitaiCharacters.txt`** — Japanese Shinjitai → Traditional (Kyūjitai) mappings. Maps modern Japanese simplified kanji to their traditional forms.
 
 Format: tab-separated, one mapping per line:
 ```
@@ -46,19 +46,23 @@ The build process has 5 steps, implemented in [`scripts/build_dataset.py`](../..
 
 All three OpenCC tables are parsed. Each source→target pair creates a bidirectional edge in a **union-find (disjoint set)** data structure. Characters connected through any chain of mappings end up in the same cluster.
 
-Example: `気` → `氣` (from JPVariants) and `气` → `氣` (from STCharacters) puts `{気, 气, 氣}` into one cluster.
+Example: `気` → `氣` (from `JPShinjitaiCharacters.txt`) and `气` → `氣` (from `STCharacters.txt`) puts `{気, 气, 氣}` into one cluster.
 
 ### Step 2: Classify Characters (JP / SC / TC)
 
-Each character in a cluster is assigned regional roles based on which OpenCC table it appeared in as a **source**:
+Each character in an OpenCC cluster is assigned regional roles using both source and target sides of the mapping dictionaries:
 
 | Role | Classification Rule |
 |---|---|
-| **JP** (Japanese) | Source in `JPVariants.txt` (Shinjitai forms) |
-| **SC** (Simplified Chinese) | Source in `STCharacters.txt` |
-| **TC** (Traditional Chinese) | Source in `TSCharacters.txt` |
+| **SC** (Simplified Chinese) | Sources in `STCharacters.txt` or Targets in `TSCharacters.txt` |
+| **TC** (Traditional Chinese) | Sources in `TSCharacters.txt` or Targets in `STCharacters.txt` / `JPShinjitaiCharacters.txt` |
+| **JP** (Japanese) | Sources in `JPShinjitaiCharacters.txt` |
 
-Characters not appearing in any table as a source are assigned to whichever roles are still empty (they're identical across standards).
+**Japanese Role Disambiguation**:
+When a cluster has no explicit entry in `JPShinjitaiCharacters.txt` (common when Simplified Chinese merged several traditional forms into a base glyph that Japanese also uses as standard Joyo kanji, e.g. `家`/`傢`, `私`/`俬`, `出`/`齣`):
+1. The builder prioritizes characters that have native Japanese Kun'yomi (`kJapaneseKun`) or On'yomi (`kJapaneseOn`) in Unihan.
+2. If `sc` characters have Kun'yomi readings, they are assigned to `jp`.
+3. If still empty, it falls back to `sc`, then `tc`.
 
 ### Step 3: Enrich with Readings and Meanings
 
@@ -68,11 +72,20 @@ For every character in each cluster, `Unihan_Readings.txt` is queried for:
 - Kun'yomi (from `kJapaneseKun`, converted from romaji → Hiragana with okurigana dots preserved)
 - English Meaning (from `kDefinition`)
 
-Readings and meanings from all characters in the cluster are merged and deduplicated.
+**Definition Sanitization Pipeline**:
+Raw Unihan definition strings undergo strict filtering to prevent tooltip overflow and remove noise:
+1. Strip parentheticals (e.g., `(simplified form of...)`).
+2. Split into tokens on `;` and `,`.
+3. Filter out tokens containing uppercase letters (`[A-Z]`, e.g., proper names, dynasty trivia).
+4. Filter out tokens containing raw CJK glyphs (`[\u4e00-\u9fff...]`).
+5. Filter out tokens longer than 3 words.
+6. Case-insensitively deduplicate and cap at 4 tokens joined by `"; "`.
 
-### Step 4: Build Inverted Index
+### Step 4: Inject Invariant Singletons & Build Inverted Index
 
-Every character appearing in any cluster's `jp`, `sc`, or `tc` list becomes a top-level key in the output JSON, pointing to the full cluster data. This enables O(1) lookup by any variant form.
+1. **Singleton Fallback**: Any character present in Unihan readings/definitions that was not involved in any OpenCC mapping table is added as a singleton cluster (`jp == sc == tc`, e.g. `表`, `作`, `感`).
+2. **Precedence Protection**: OpenCC-derived multi-character clusters strictly take precedence during inverted index generation to prevent singleton collisions from overwriting valid variant clusters.
+3. Every character appearing in any cluster's `jp`, `sc`, or `tc` list becomes a top-level key in the output JSON.
 
 ### Step 5: Write Output
 
@@ -91,7 +104,7 @@ Each top-level key is a single character. The value contains the full cluster:
     "pinyin": ["qì", "qǐ"],
     "onyomi": ["キ", "ケ"],
     "kunyomi": ["いき"],
-    "meaning": "air, gas, steam, vapor; spirit"
+    "meaning": "steam; vapor; air; gas"
   }
 }
 ```
@@ -127,13 +140,13 @@ All source URLs and filenames are configured in [`scripts/dataset_builder/source
 
 | Metric | Value |
 |---|---|
-| Total indexed characters (keys) | ~9,700 |
-| Unique equivalence clusters | ~5,500 |
-| Characters with Japanese readings | ~3,200 |
-| Characters with Pinyin | ~9,400 |
+| Total indexed characters (keys) | ~45,700 |
+| Unique equivalence clusters | ~45,700 |
+| Characters with Japanese readings | ~14,000 |
+| Characters with Pinyin | ~45,000 |
 | Three-way different characters (JP ≠ SC ≠ TC) | ~540 |
-| All-identical characters (JP = SC = TC) | ~3,200 |
-| Output file size | ~980 KB |
+| All-identical characters (JP = SC = TC) | ~41,000 |
+| Output file size | ~6.5 MB |
 
 ## Notes
 

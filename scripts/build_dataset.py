@@ -37,7 +37,10 @@ def main() -> None:
     jp_path = SOURCES_DIR / opencc_cfg.get("jp_variants", "JPShinjitaiCharacters.txt")
     unihan_path = SOURCES_DIR / "Unihan_Readings.txt"
 
-    print("\n--- 2. Building variant clusters ---")
+    print("\n--- 2. Parsing readings and building variant clusters ---")
+    readings = parse_unihan_readings(unihan_path)
+    definitions = parse_unihan_definitions(unihan_path)
+
     uf = build_variant_graph([st_path, ts_path, jp_path])
     clusters = uf.clusters()
 
@@ -47,22 +50,36 @@ def main() -> None:
 
     classified_clusters = []
     for _root, chars in clusters.items():
-        classified = classify_cluster(chars, st_map, ts_map, jp_map)
+        classified = classify_cluster(chars, st_map, ts_map, jp_map, readings=readings)
         if classified["jp"] or classified["sc"] or classified["tc"]:
             classified_clusters.append(classified)
 
     print(f"Total clusters: {len(classified_clusters)}")
 
     print("\n--- 3. Enriching with readings and definitions ---")
-    readings = parse_unihan_readings(unihan_path)
-    definitions = parse_unihan_definitions(unihan_path)
     
+    opencc_assigned_chars = set(uf.parent.keys())
+    for c in classified_clusters:
+        opencc_assigned_chars.update(c.get("jp", []))
+        opencc_assigned_chars.update(c.get("sc", []))
+        opencc_assigned_chars.update(c.get("tc", []))
+        
+    all_unihan_chars = set(readings.keys()).union(set(definitions.keys()))
+    for ch in all_unihan_chars:
+        if ch not in opencc_assigned_chars:
+            classified_clusters.append({
+                "jp": [ch],
+                "sc": [ch],
+                "tc": [ch]
+            })
+
     output = {}
     for cluster_data in classified_clusters:
         enriched = enrich_cluster(cluster_data, readings, definitions)
         all_chars = set(enriched["jp"] + enriched["sc"] + enriched["tc"])
         for ch in all_chars:
-            output[ch] = enriched
+            if ch not in output:
+                output[ch] = enriched
 
     print(f"Total indexed characters: {len(output)}")
 
