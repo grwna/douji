@@ -7,9 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [1.1.0] - 2026-09-02
+
 ### Added
-- English definitions derived from Unihan (`kDefinition`) to character tooltip.
-- `show_meanings` config option to toggle definition display.
+- English definitions row in hover tooltips.
+- `show_meanings` configuration toggle to show/hide character definitions.
+- Expanded character database covering over 45,700 CJK characters, supporting both variant clusters and invariant characters.
+- Reproducible dataset build pipeline (`scripts/build_dataset.py`) for automated compilation and updates.
+
+### Changed
+- Standardized character database file name to `dataset.json`.
+- Updated Japanese mapping source to modern OpenCC Shinjitai specifications.
+
 
 ## [1.0.0] - 2026-08-21
 
@@ -34,5 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit test suite for character resolution and variant matching.
 - Automated packaging script (`package.sh`) producing `.ankiaddon` releases.
 
-[unreleased]: https://github.com/grwna/douji/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/grwna/douji/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/grwna/douji/releases/tag/v1.1.0
 [1.0.0]: https://github.com/grwna/douji/releases/tag/v1.0.0

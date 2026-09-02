@@ -25,8 +25,17 @@ jobs:
           chmod +x package.sh
           ./package.sh
 
+      - name: Extract Release Notes from CHANGELOG.md
+        id: changelog
+        uses: octivi/release-notes-from-changelog@v1
+        with:
+          tag: ${{ github.ref_name }}
+          changelog: CHANGELOG.md
+          release_notes: release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: "*.ankiaddon"
-          generate_release_notes: true
+          body_path: release-notes.md
+          generate_release_notes: false
