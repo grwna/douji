@@ -22,7 +22,7 @@ Kana readings.
 │  [tooltip.js: caretRangeFromPoint extracts char]            │
 │         │                                                   │
 │         ▼                                                   │
-│  [pycmd("douji:lookup:{"char": "気", "req_id": "5"}")]     │
+│  [pycmd("douji:lookup:{"char": "気", "req_id": "5"}")]      │
 └──────────────────────────┬──────────────────────────────────┘
                            │  (Anki bridge)
                            ▼
@@ -31,9 +31,9 @@ Kana readings.
 │                                                             │
 │  BridgeManager.on_js_message()                              │
 │    └─► LookupEngine.lookup(char)                            │
-│          └─► VariantMappingProvider  ◄── char_variants.json │
+│          └─► VariantMappingProvider  ◄── dataset.json       │
 │                (O(1) in-memory dict lookup)                 │
-│  BridgeManager._eval_js() → JS callback with result        │
+│  BridgeManager._eval_js() → JS callback with result         │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            ▼
@@ -54,7 +54,7 @@ Kana readings.
 **1. Addon loads** (`__init__.py`):
 - Instantiates `ConfigManager`, `LookupEngine`, `BridgeManager`.
 - `LookupEngine` creates a `VariantMappingProvider`, which immediately loads
-  `char_variants.json` (~981 KB, 9,688 character clusters) into `self._data`.
+  `dataset.json` (~981 KB, 9,688 character clusters) into `self._data`.
 - Registers three Anki hooks: `webview_will_set_content`, `webview_did_receive_js_message`,
   and two reviewer card-flip hooks.
 
@@ -88,7 +88,7 @@ Kana readings.
   `register_provider()` without changing the bridge or JS.
 
 ### `VariantMappingProvider` (`backend/providers/variant_provider.py`)
-- Loads `char_variants.json` once at startup into `self._data`.
+- Loads `dataset.json` once at startup into `self._data`.
 - `lookup(char)` takes `char[0]`, looks it up, and returns a result dict with:
   - `jp`, `sc`, `tc` — variant form lists
   - `pinyin`, `onyomi`, `kunyomi` — readings (may be empty lists)
@@ -124,7 +124,7 @@ Kana readings.
 
 ---
 
-## Data Format (`char_variants.json`)
+## Data Format (`dataset.json`)
 
 **Coverage**: 9,688 character clusters across common Japanese Kanji and Chinese Hanzi.
 
@@ -139,7 +139,8 @@ Unicode Pinyin data (tone-marked Mandarin).
     "tc": ["氣"],
     "pinyin": ["qì", "qǐ"],
     "onyomi": ["キ", "ケ"],
-    "kunyomi": ["いき"]
+    "kunyomi": ["いき"],
+    "meaning": "air, gas, steam, vapor; spirit"
   }
 }
 ```
@@ -171,7 +172,7 @@ only `[0]` of each.
 | No build step for JS | `tooltip.js` is read as a raw string and eval'd by Python — it must be a single self-contained file |
 | ES5-only JS | Anki's QtWebEngine version varies; no optional chaining `?.`, no nullish coalescing `??`, no template literals |
 | `aqt` not importable in tests | Root `__init__.py` imports Anki at module level; tests bypass it via `sys.path` insertion from `tests/` |
-| `char_variants.json` is read-only | It's a precompiled dataset — modifying lookup behavior means replacing or augmenting the file, not editing in place |
+| `dataset.json` is read-only | It's a precompiled dataset — modifying lookup behavior means replacing or augmenting the file, not editing in place |
 
 ---
 
@@ -195,6 +196,7 @@ the config editor UI). Documented for end users in `config.md`.
 | `popup_max_width` | int | `320` | Maximum tooltip width in px |
 | `show_pinyin` | bool | `true` | Show Mandarin Pinyin reading row |
 | `show_readings` | bool | `true` | Show Japanese On-yomi / Kun-yomi reading row |
+| `show_meanings` | bool | `true` | Show English meaning row |
 
 Config is passed to JS as `window.DOUJI_INITIAL_CONFIG` at injection time.
 The JS `onConfig` bridge handler can update it at runtime without a page reload.

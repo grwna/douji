@@ -1,17 +1,15 @@
-"""Variant mapping lookup provider."""
 import json
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 from .base import BaseLookupProvider
+from ..constants import DATASET_PATH
 
 
 class VariantMappingProvider(BaseLookupProvider):
     """Provides cross-reference character variant data from precompiled JSON."""
 
-    def __init__(self, data_path: Optional[str] = None):
-        if data_path is None:
-            data_path = str(Path(__file__).resolve().parents[2] / "data" / "char_variants.json")
-        self.data_path = data_path
+    def __init__(self, data_path: Optional[Union[str, Path]] = None):
+        self.data_path = Path(data_path) if data_path is not None else DATASET_PATH
         self._data: Dict[str, Any] = {}
         self._load_data()
 
@@ -51,6 +49,7 @@ class VariantMappingProvider(BaseLookupProvider):
                 "pinyin": entry.get("pinyin", []),
                 "onyomi": entry.get("onyomi", []),
                 "kunyomi": entry.get("kunyomi", []),
+                "meaning": entry.get("meaning", ""),
                 "all_identical": all_identical,
                 "all_different": all_different,
                 "hovered_variant": hovered_variant,

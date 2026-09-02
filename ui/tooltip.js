@@ -16,6 +16,7 @@
       popup_max_width: 320,
       show_pinyin: true,
       show_readings: true,
+      show_meanings: true,
     },
     window.DOUJI_INITIAL_CONFIG || {}
   );
@@ -28,7 +29,7 @@
   var activeCharRect = null;
   var lastMousePos = { x: 0, y: 0 };
 
-  // Only match Hanzi / Kanji ideographs (ignores kana, punctuation, spaces, latin)
+  // Only match Hanzi / Kanji ideographs 
   function isCJKIdeograph(char) {
     if (!char) return false;
     var code = char.codePointAt(0);
@@ -78,7 +79,7 @@
       c.style.setProperty("--douji-max-width", config.popup_max_width + "px");
     }
 
-    // Explicit Theme Switching (Light / Dark / Auto)
+    // Themes
     c.classList.remove("douji-theme-light", "douji-theme-dark");
     var theme = (config.theme || "auto").toLowerCase();
     if (theme === "light") {
@@ -291,9 +292,16 @@
       var hasPinyin = config.show_pinyin && data.pinyin && data.pinyin.length > 0;
       var onyomi = config.show_readings && data.onyomi && data.onyomi.length > 0 ? data.onyomi : null;
       var kunyomi = config.show_readings && data.kunyomi && data.kunyomi.length > 0 ? data.kunyomi : null;
+      var hasMeaning = config.show_meanings && data.meaning && data.meaning.length > 0;
 
-      if (hasPinyin || onyomi || kunyomi) {
+      if (hasMeaning || hasPinyin || onyomi || kunyomi) {
         html += '<div class="douji-readings">';
+        if (hasMeaning) {
+          html += '<div class="douji-reading-row">';
+          html += '  <span class="douji-reading-label">Meanings</span>';
+          html += '  <span class="douji-reading-val douji-meaning-val">' + escapeHtml(data.meaning) + '</span>';
+          html += '</div>';
+        }
         if (hasPinyin) {
           html += '<div class="douji-reading-row">';
           html += '  <span class="douji-reading-label">Pinyin</span>';

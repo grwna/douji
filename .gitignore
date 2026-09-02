@@ -54,3 +54,6 @@ meta.json
 
 # Markdown
 *_plan.md
+
+# Downloaded source datasets (re-downloadable via scripts/download_sources.py)
+scripts/sources/

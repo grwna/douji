@@ -33,7 +33,7 @@ included_top_level = [
     "config.json",
     "config.md",
     "backend",
-    "web",
+    "ui",
     "data",
 ]
 

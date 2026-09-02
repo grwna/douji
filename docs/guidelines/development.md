@@ -8,19 +8,20 @@ project/
 ├── manifest.json            # Anki metadata + version number
 ├── config.json              # User-facing default config (Anki reads this)
 ├── backend/
+│   ├── constants.py         # Paths, addon metadata, bridge prefix, default config
 │   ├── config.py            # ConfigManager — reads Anki addonManager settings
 │   ├── engine.py            # LookupEngine — coordinates providers
 │   ├── bridge.py            # BridgeManager — JS↔Python bridge + asset injection
 │   └── providers/
 │       ├── base.py          # BaseLookupProvider (ABC)
-│       └── variant_provider.py  # Reads char_variants.json, does lookups
-├── web/
+│       └── variant_provider.py  # Reads dataset, does lookups
+├── ui/
 │   ├── tooltip.js           # Frontend IIFE — all tooltip logic
 │   └── tooltip.css          # Tooltip styles
 ├── data/
-│   └── char_variants.json   # Precompiled character variant data (~1MB)
+│   └── dataset.json         # Precompiled character variant data (~1MB)
 ├── tests/
-│   └── test_lookup.py       # Unit tests (run via `python test_lookup.py`)
+│   └── tests.py             # Unit tests 
 └── docs/
     └── guidelines/          # You are here
 ```
@@ -30,7 +31,7 @@ project/
 Tests do not require Anki installed. Run from the `tests/` directory:
 
 ```bash
-cd tests && python test_lookup.py -v
+python tests/tests.py -v
 ```
 
 > [!WARNING]

@@ -1,11 +1,9 @@
 """Bridge connecting Anki webview JS and Python backend."""
 import json
-from pathlib import Path
 from typing import Any, Tuple
+from .constants import BRIDGE_PREFIX, UI_DIR
 from .engine import LookupEngine
 from .config import ConfigManager
-
-PREFIX = "douji:"
 
 
 class BridgeManager:
@@ -14,13 +12,13 @@ class BridgeManager:
     def __init__(self, engine: LookupEngine, config_manager: ConfigManager):
         self.engine = engine
         self.config_manager = config_manager
-        self._web_dir = Path(__file__).resolve().parents[1] / "web"
+        self._ui_dir = UI_DIR
         self._file_cache: dict[str, str] = {}
 
     def _read_web_file(self, filename: str) -> str:
-        """Read and cache a file from the web directory."""
+        """Read and cache a file from the UI directory."""
         if filename not in self._file_cache:
-            path = self._web_dir / filename
+            path = self._ui_dir / filename
             if path.exists():
                 self._file_cache[filename] = path.read_text(encoding="utf-8")
             else:
@@ -55,10 +53,10 @@ class BridgeManager:
 
     def on_js_message(self, handled: Tuple[bool, Any], message: str, context: Any) -> Tuple[bool, Any]:
         """Process incoming bridge messages from JS."""
-        if not isinstance(message, str) or not message.startswith(PREFIX):
+        if not isinstance(message, str) or not message.startswith(BRIDGE_PREFIX):
             return handled
 
-        subcommand = message[len(PREFIX):]
+        subcommand = message[len(BRIDGE_PREFIX):]
 
         if subcommand.startswith("lookup:"):
             payload_str = subcommand[len("lookup:"):]
