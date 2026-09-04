@@ -41,9 +41,10 @@ Hover over any character in the reviewer while holding a modifier key to view it
 ### Key Features
 
 - **Regional Variants**: Shows 🇯🇵 **JP** (Japanese Kanji), 🇨🇳 **SC** (Simplified Chinese), and 🇹🇼 **TC** (Traditional Chinese) forms side-by-side.
+- **English Definitions**: Optional row of English definitions for the hovered character directly in the tooltip.
 - **Dynamic Accent Highlighting**: If all three regional forms differ (e.g. `気` vs `气` vs `氣` or `発` vs `发` vs `發`), the hovered variant row is automatically highlighted with an accent border.
 - **Tone-Marked Readings**: Displays Mandarin Pinyin with tone marks and Japanese On-yomi / Kun-yomi readings in Kana.
-- **Extensive Coverage**: Bundled with a precompiled database of **9,688 character clusters** covering all standard Joyo/Jinmeiyo Kanji and Chinese Hanzi.
+- **Extensive Coverage**: Bundled with a precompiled database of **45,700+ CJK characters**, including variant clusters and invariant characters, sourced from the modern OpenCC Shinjitai specifications.
 - **Instant & Responsive**: Pure local in-memory lookup (<1ms), debounced hover detection, and automatic viewport edge-flipping.
 - **Dark Mode**: Native palette adaptation matching Anki's dark / night mode.
 
@@ -73,6 +74,7 @@ Customize options via **Tools** → **Add-ons** → select **Douji** → **Confi
 - `character_font_size` & `reading_font_size`: Font sizes in pixels.
 - `japanese_font` & `chinese_font`: Custom CSS font-family strings for regional glyphs.
 - `show_pinyin` & `show_readings`: Toggle Pinyin / Kana readings display.
+- `show_meanings`: Toggle English definitions display.
 
 ---
 

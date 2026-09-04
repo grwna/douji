@@ -104,17 +104,16 @@ For detailed explanations of all settings, see [`config.md`](docs/CONFIG.md).
 
 - Cross-referencing operates on individual CJK ideographs rather than multi-character compound words.
 - Requires the desktop Qt webview reviewer.
-- Covers 9,688 character clusters from common Japanese Joyo/Jinmeiyo and Chinese standard character sets. Extremely rare or archaic historical variants may not be mapped.
 - Only shows characters with equivalence in all three variants. This means it can't be used to check Simplified-Traditional Mandarin only.
 - Definitions are unified using the Unihan database and provide a generalized English meaning. They do not differentiate between distinct Chinese and Japanese usages of the same character.
+- Definitions might not show the most useful or relevant meanings in some cases, as they are automatically generated from the Unihan database.
 
 ---
 
 ## Future Plans
 
-- Dictionary & Definitions**: Direct integration with external dictionary providers (e.g., CEDICT, JMdict, Jitendex) for on-hover definitions and vocabulary breakdown.
-- Native audio playback support for Pinyin and Japanese readings.
-- Visual stroke order diagrams for Kanji/Hanzi comparisons.
+- Persistent popup, closer to Yomitan, which will allow for popup elements to be clickable
+- Primitive decomposition for characters
 
 ---
 
